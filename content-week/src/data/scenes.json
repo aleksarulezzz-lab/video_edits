@@ -1,0 +1,67 @@
+[
+ {
+  "start": 0.0,
+  "end": 364.48,
+  "kind": "head"
+ },
+ {
+  "start": 364.48,
+  "end": 482.06,
+  "kind": "screen"
+ },
+ {
+  "start": 482.06,
+  "end": 491.78,
+  "kind": "head"
+ },
+ {
+  "start": 491.78,
+  "end": 521.78,
+  "kind": "screen"
+ },
+ {
+  "start": 521.78,
+  "end": 535.24,
+  "kind": "head"
+ },
+ {
+  "start": 535.24,
+  "end": 631.66,
+  "kind": "screen"
+ },
+ {
+  "start": 631.66,
+  "end": 698.2,
+  "kind": "head"
+ },
+ {
+  "start": 698.2,
+  "end": 740.66,
+  "kind": "screen"
+ },
+ {
+  "start": 740.66,
+  "end": 956.2,
+  "kind": "head"
+ },
+ {
+  "start": 956.2,
+  "end": 1152.42,
+  "kind": "screen"
+ },
+ {
+  "start": 1152.42,
+  "end": 1573.1,
+  "kind": "head"
+ },
+ {
+  "start": 1573.1,
+  "end": 1643.98,
+  "kind": "screen"
+ },
+ {
+  "start": 1643.98,
+  "end": 1832.0,
+  "kind": "head"
+ }
+]
