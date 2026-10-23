@@ -18,3 +18,7 @@
 1. Положить рабочую копию исходника с размытой панелью ChatGPT в `content-week/public/media/raw_sanitized.mp4` (не хранится в git, команда ffmpeg — в `docs/montage_report.md`).
 2. `cd content-week && npm install`
 3. Предпросмотр: `npx remotion studio`. Рендер: `npx remotion render Main out/final.mp4 --crf=17`.
+
+## Идеи для следующих видео
+
+* Перебивки шагов в формате тир-листа: доска S/A/B/C, карточка каждого шага встаёт в свой ряд по ходу ролика, в финале — весь тир-лист как итог. Нужны критерий и оценки автора.
