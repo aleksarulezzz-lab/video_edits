@@ -27,7 +27,7 @@
   }
  },
  {
-  "out": 512.08,
+  "out": 511.52,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
@@ -36,7 +36,7 @@
   }
  },
  {
-  "out": 564.88,
+  "out": 564.32,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
@@ -46,7 +46,7 @@
   "nosnap": true
  },
  {
-  "out": 581.16,
+  "out": 580.6,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
@@ -56,7 +56,7 @@
   "nosnap": true
  },
  {
-  "out": 764.36,
+  "out": 764.2,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
