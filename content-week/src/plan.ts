@@ -73,7 +73,7 @@ export const overlays: Overlay[] = [
     props: { items: [{ t: 1.55, id: "youtube" }, { t: 2.5, id: "instagram" }, { t: 3.1, id: "telegram" }, { t: 3.6, id: "vk" }, { t: 4.3, id: "dzen" }], dailyAt: 6.0 },
   },
   { a: 2.4, b: 8.6, kind: "Disclaimer", sfx: "none" },
-  { a: 9.9, b: 19.3, kind: "OneToMany", full: true, sfx: "whoosh", props: { longAt: 10.4, splitAt: 13.7, postsAt: 15.1, articlesAt: 17.0 } },
+  { a: 10.2, b: 19.3, kind: "OneToMany", full: true, sfx: "whoosh", props: { longAt: 10.25, splitAt: 13.7, postsAt: 15.1, articlesAt: 17.0 } },
   { a: 31.4, b: 36.4, kind: "Roadmap", sfx: "click", props: { items: [{ t: 31.68, label: "Идея" }, { t: 32.16, label: "Сценарий" }, { t: 33.16, label: "Готовые публикации" }] } },
   {
     a: 37.0, b: 41.0, kind: "WallCompare", sfx: "none",
@@ -82,9 +82,9 @@ export const overlays: Overlay[] = [
   // PROBLEM → APPROACH
   { a: 48.3, b: 52.9, kind: "Kinetic", sfx: "none", props: { items: [it(48.5, "Регулярно"), it(49.5, "Постоянно"), it(51.4, "Продолжительное время", { accent: true })] } },
   {
-    a: 53.5, b: 70.0, kind: "Compare", full: true, sfx: "whoosh",
+    a: 55.6, b: 70.0, kind: "Compare", full: true, sfx: "whoosh",
     props: {
-      heading: { t: 53.6, text: "другой подход" },
+      heading: { t: 55.7, text: "другой подход" },
       left: { t: 56.2, title: "Каждая единица контента — отдельно", color: "#9AA0AA" },
       right: { t: 59.0, title: "Одна система и одна исходная единица", color: "#FF5A36", items: [it(65.7, "размножается в разных форматах"), it(67.3, "под площадки, которые ведёшь")] },
     },
@@ -168,7 +168,7 @@ export const overlays: Overlay[] = [
     a: 518.2, b: 534.6, kind: "WallPrompt",
     props: { title: "промпт для сценария", items: [it(520.22, "Помоги разработать сценарий моего видео"), it(526.8, "Моё видео будет отличаться тем, что…"), it(531.0, "…и дальше — о чём хотите рассказать")] },
   },
-  { a: 549.5, b: 562.9, kind: "FiveLines", full: true, sfx: "whoosh", props: { barAt: 550.0, splitAt: 557.74, outAt: 560.2, label: "5 смысловых линий → 5 роликов" } },
+  { a: 549.5, b: 562.9, kind: "FiveLines", full: true, sfx: "whoosh", props: { barAt: 549.5, splitAt: 557.74, outAt: 560.2, label: "5 смысловых линий → 5 роликов" } },
   // STEP 4 — recording
   { a: 563.3, b: 566.6, kind: "SectionTitle", sfx: "swell", props: { step: "Шаг 4", title: "Записываю длинное видео целиком" } },
   // STEP 5 — five shorts
@@ -224,8 +224,8 @@ export const overlays: Overlay[] = [
   },
   { a: 929.7, b: 941.0, kind: "BlankPage", props: { label: "чистый лист" } },
   {
-    a: 954.6, b: 965.0, kind: "Compare", full: true, sfx: "whoosh",
-    props: { heading: { t: 954.98, text: "я миксую два подхода" }, left: { t: 958.44, title: "Ролики из длинного видео", color: "#8EA6FF" }, right: { t: 961.14, title: "Отдельные сценарии", color: "#FF5A36" } },
+    a: 958.0, b: 965.0, kind: "Compare", full: true, sfx: "whoosh",
+    props: { heading: { t: 958.1, text: "я миксую два подхода" }, left: { t: 958.44, title: "Ролики из длинного видео", color: "#8EA6FF" }, right: { t: 961.14, title: "Отдельные сценарии", color: "#FF5A36" } },
   },
   { a: 1041.9, b: 1049.4, kind: "NoteChip", sfx: "click", props: { text: "Под коротким роликом — ссылка на длинное видео" } },
   { a: 1055.0, b: 1068.0, kind: "GrowPlatforms", props: { items: [{ t: 1057.4, id: "youtube" }, { t: 1059.6, id: "telegram" }, { t: 1061.6, id: "vk" }, { t: 1063.4, id: "dzen" }] } },

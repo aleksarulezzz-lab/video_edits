@@ -91,8 +91,11 @@ const KineticInner: React.FC<Span & { items: { t: number; text: string; accent?:
     <WallBox>
       {items.map((it, i) => {
         const p = enter(t, it.t, 0.45, EASE.pop) * exit(t, b - 0.35, 0.35);
+        // shrink so the longest word still fits the wall (≈0.62 em per Cyrillic glyph in Manrope 800)
+        const longest = Math.max(...it.text.split(" ").map((w) => w.length));
+        const fs = Math.min(size, Math.floor(WALL.w / (0.62 * longest)));
         return (
-          <div key={i} style={{ fontWeight: 800, fontSize: size, lineHeight: 1.05, letterSpacing: -1.8, color: it.accent ? ACCENT : INK, ...slide(p, 24) }}>
+          <div key={i} style={{ fontWeight: 800, fontSize: fs, lineHeight: 1.05, letterSpacing: -1.8, color: it.accent ? ACCENT : INK, ...slide(p, 24) }}>
             {it.text}
           </div>
         );
