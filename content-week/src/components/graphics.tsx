@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { enter, exit, life, lerp, useSec } from "../anim";
+import { enter, exit, life, lerp, useEditT } from "../anim";
 import { C, EASE, FONT } from "../theme";
 import { Card, Chip, FakeFrame, Label, PLATFORM, PlatformBadge, TextLines } from "./ui";
 
@@ -9,7 +9,7 @@ import { Card, Chip, FakeFrame, Label, PLATFORM, PlatformBadge, TextLines } from
  * times in absolute output seconds, so the plan reads like a cue sheet.
  */
 type Span = { a: number; b: number };
-const useT = (a: number) => useSec() + a;
+const useT = (a: number) => useEditT(a);
 
 const PANEL = { x: 1056, y: 64, w: 800, h: 952 }; // right-hand area while the head is framed left
 

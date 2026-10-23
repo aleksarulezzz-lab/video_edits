@@ -1,5 +1,6 @@
 import { interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import { EASE } from "./theme";
+import { T, invT } from "./timeline";
 
 /** Seconds since the enclosing <Sequence> started. */
 export const useSec = () => {
@@ -23,3 +24,6 @@ export const life = (t: number, a: number, b: number, inDur = 0.5, outDur = 0.35
   Math.min(enter(t, a, inDur), exit(t, b - outDur, outDur));
 
 export const lerp = (p: number, a: number, b: number) => a + (b - a) * p;
+
+/** Current time in the author's-cut timeline for a graphic whose plan start is `a`. */
+export const useEditT = (a: number) => invT(T(a) + useSec());

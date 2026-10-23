@@ -3,19 +3,22 @@ import { useCurrentFrame } from "remotion";
 import captionsJson from "../data/captions.json";
 import { overlays } from "../plan";
 import { C, FONT, FPS } from "../theme";
-import { sceneAtOut, splitAt } from "../timeline";
+import { invT, sceneAtOut, splitAt } from "../timeline";
 
 type Page = { start: number; end: number; lines: { w: string; hl: boolean }[][] };
 const pages = captionsJson as Page[];
 
-const fullAt = (t: number) => overlays.some((o) => o.full && t >= o.a + 0.2 && t < o.b - 0.2);
+const fullAt = (to: number) => {
+  const t = invT(to);
+  return overlays.some((o) => o.full && t >= o.a + 0.2 && t < o.b - 0.2);
+};
 
 export const Subtitles: React.FC = () => {
   const t = useCurrentFrame() / FPS;
   const page = pages.find((p) => t >= p.start && t < p.end);
   if (!page) return null;
   const screen = sceneAtOut(t).kind === "screen";
-  const split = splitAt(t) > 0.5;
+  const split = splitAt(invT(t)) > 0.5;
   const full = fullAt(t);
   // Place the block where it does not compete with what is being shown.
   let box: React.CSSProperties = { left: 0, right: 0, bottom: 64 };

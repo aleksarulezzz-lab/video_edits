@@ -1,12 +1,36 @@
 import { interpolate } from "remotion";
 import edlJson from "./data/edl.json";
+import insertsJson from "./data/inserts.json";
+import timemapJson from "./data/timemap.json";
 import scenesJson from "./data/scenes.json";
 import { camMoves, screenKeys, splits } from "./plan";
 import { EASE } from "./theme";
 
 export type Clip = { out: number; in: number; dur: number };
 export const edl: Clip[] = edlJson as Clip[];
-export const TOTAL = edl.length ? edl[edl.length - 1].out + edl[edl.length - 1].dur : 10;
+export type Insert = { out: number; dur: number; kind: string; props?: Record<string, unknown> };
+export const INSERTS: Insert[] = insertsJson as Insert[];
+export const TOTAL = Math.max(
+  edl.length ? edl[edl.length - 1].out + edl[edl.length - 1].dur : 10,
+  ...INSERTS.map((i) => i.out + i.dur),
+);
+
+/**
+ * The plan is authored in the author's-cut timeline ("edit"); cuts, the restored word and
+ * inserted cards move everything after them. timemap rows: [edit0, out0, edit1, out1].
+ */
+const TM = timemapJson as [number, number, number, number][];
+export const T = (te: number) => {
+  for (const [e0, o0, e1] of TM) if (e1 > e0 && te >= e0 && te < e1) return o0 + (te - e0);
+  const next = TM.find(([e0]) => e0 >= te);
+  return next ? next[1] : TOTAL;
+};
+export const invT = (to: number) => {
+  for (const [e0, o0, e1, o1] of TM) {
+    if (to >= o0 && to < o1) return e1 > e0 ? e0 + (to - o0) : e0;
+  }
+  return TM.length ? TM[TM.length - 1][2] : to;
+};
 
 type Scene = { start: number; end: number; kind: "head" | "screen" };
 const scenes = scenesJson as Scene[];

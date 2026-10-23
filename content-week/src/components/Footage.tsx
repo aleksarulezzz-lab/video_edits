@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { C, EASE, FPS } from "../theme";
-import { edl, sceneAt, headCam, screenCam, splitAt } from "../timeline";
+import { edl, sceneAt, headCam, screenCam, splitAt, invT } from "../timeline";
 
 const SRC = staticFile("media/raw_sanitized.mp4");
 const RAW_W = 1440;
@@ -150,7 +150,7 @@ const ClipVideoContext = React.createContext<ClipCtx>({ trim: 0, volume: () => 1
 const ClipView: React.FC<{ outStart: number; rawIn: number; dur: number }> = ({ outStart, rawIn, dur }) => {
   const frame = useCurrentFrame();
   const local = frame / FPS;
-  const t = outStart + local;
+  const t = invT(outStart + local); // plan (author's-cut) time
   const rawT = rawIn + local;
   const scene = sceneAt(rawT);
   const total = Math.round(dur * FPS);
@@ -161,7 +161,7 @@ const ClipView: React.FC<{ outStart: number; rawIn: number; dur: number }> = ({ 
       {scene.kind === "head" ? (
         <HeadView t={t} />
       ) : (
-        <ScreenView t={t} sceneStart={Math.max(outStart, outStart + (scene.start - rawIn))} />
+        <ScreenView t={t} sceneStart={invT(Math.max(outStart, outStart + (scene.start - rawIn)))} />
       )}
     </ClipVideoContext.Provider>
   );

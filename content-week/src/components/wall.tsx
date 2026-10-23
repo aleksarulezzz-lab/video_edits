@@ -1,5 +1,5 @@
 import React from "react";
-import { enter, exit, life, useSec } from "../anim";
+import { enter, exit, life, useEditT } from "../anim";
 import { C, EASE, FONT } from "../theme";
 import { Card, Chip, PLATFORM, PlatformBadge } from "./ui";
 
@@ -15,7 +15,7 @@ const ACCENT = "#D23A1C"; // darker coral that holds contrast on the grey wall
 const AI = "#3B57D4";
 
 type Span = { a: number; b: number };
-const useT = (a: number) => useSec() + a;
+const useT = (a: number) => useEditT(a);
 const slide = (p: number, d = 30): React.CSSProperties => ({ opacity: p, transform: `translateX(${(1 - p) * -d}px)` });
 
 const WallBox: React.FC<{ children: React.ReactNode; justify?: "center" | "flex-start"; style?: React.CSSProperties }> = ({
