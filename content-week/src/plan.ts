@@ -25,7 +25,7 @@ export type ScreenKey = {
 
 // ---------------- talking-head camera ----------------
 export const camMoves: CamMove[] = [
-  { a: 23.8, b: 26.2, zoom: 1.2 }, // «Как тебе такой план?»
+  { a: 24.49, b: 26.2, zoom: 1.2, ramp: 0.04 }, // «Как тебе такой план?» — hard cut hides the removed pause
   { a: 41.0, b: 44.0, zoom: 1.18 }, // «самым утомительным…»
   { a: 94.0, b: 105.0, zoom: 1.15, ramp: 1.2 },
   { a: 138.2, b: 143.6, zoom: 1.22 }, // «Но есть важный нюанс»
@@ -136,15 +136,15 @@ export const overlays: Overlay[] = [
     },
   },
   // YouTube search screencast
-  { a: 271.0, b: 279.4, kind: "NoteChip", sfx: "click", props: { text: "22 тыс. просмотров" } },
-  { a: 280.6, b: 286.6, kind: "NoteChip", sfx: "click", props: { text: "41 тыс. подписчиков на канале" } },
-  { a: 303.0, b: 308.3, kind: "NoteChip", sfx: "click", props: { text: "86 тыс. просмотров" } },
-  { a: 308.5, b: 312.4, kind: "NoteChip", sfx: "click", props: { text: "20 тыс. подписчиков" } },
+  { a: 271.0, b: 273.6, kind: "NoteChip", sfx: "click", props: { text: "22 тыс. просмотров" } },
+  { a: 280.6, b: 283.6, kind: "NoteChip", sfx: "click", props: { text: "41 тыс. подписчиков на канале" } },
+  { a: 303.0, b: 306.2, kind: "NoteChip", sfx: "click", props: { text: "86 тыс. просмотров" } },
+  { a: 308.5, b: 311.0, kind: "NoteChip", sfx: "click", props: { text: "20 тыс. подписчиков" } },
   {
     a: 312.6, b: 338.6, kind: "ViewsVsSubs", full: true, sfx: "whoosh",
     props: { full: true, views: "86 тыс.", subs: "20 тыс.", viewsN: 86, subsN: 20, at: 313.2, verdictAt: 319.9, verdict: "Просмотров больше, чем подписчиков — видео зацепило аудиторию" },
   },
-  { a: 367.6, b: 375.8, kind: "NoteChip", sfx: "click", props: { text: "Плагин YouTube Summary → транскрипция" } },
+  { a: 367.6, b: 375.8, kind: "PluginBadge", sfx: "pop", props: { label: "плагин для Chrome → транскрипция" } },
   {
     a: 384.0, b: 419.6, kind: "PromptCard", sfx: "pop",
     props: { place: "screen", title: "промпт голосом", items: [it(387.96, "Проанализируй транскрибацию видео"), it(394.5, "Почему оно набрало 86 тыс. просмотров при 20 тыс. подписчиков?"), it(403.66, "Выдели структуру и сильные моменты"), it(413.22, "Дай рекомендации для моего видео")] },
@@ -243,10 +243,10 @@ export const extraSfx: { t: number; kind: "whoosh" | "click" | "pop" | "swell" }
 
 /** Hand-drawn red ovals around the numbers the author reads off the screen (raw-pixel rects). */
 export const screenMarks: { a: number; b: number; rect: [number, number, number, number] }[] = [
-  { a: 271.0, b: 273.7, rect: [774, 263, 58, 26] }, // 22 тыс. просмотров
-  { a: 280.6, b: 283.8, rect: [536, 422, 162, 28] }, // 41,8 тыс. подписчиков
-  { a: 289.0, b: 291.6, rect: [776, 608, 58, 26] }, // 83 тыс. просмотров
-  { a: 293.0, b: 299.0, rect: [570, 422, 160, 28] }, // 39,6 тыс. подписчиков
-  { a: 303.0, b: 306.4, rect: [776, 514, 56, 26] }, // 86 тыс. просмотров
-  { a: 308.5, b: 311.2, rect: [580, 422, 160, 28] }, // 20,5 тыс. подписчиков
+  { a: 271.0, b: 273.2, rect: [774, 263, 58, 26] }, // 22 тыс. просмотров
+  { a: 280.6, b: 283.3, rect: [536, 422, 162, 28] }, // 41,8 тыс. подписчиков
+  { a: 289.0, b: 291.1, rect: [776, 608, 58, 26] }, // 83 тыс. просмотров
+  { a: 293.0, b: 298.6, rect: [570, 422, 160, 28] }, // 39,6 тыс. подписчиков
+  { a: 303.0, b: 305.8, rect: [776, 514, 56, 26] }, // 86 тыс. просмотров
+  { a: 308.5, b: 310.6, rect: [580, 422, 160, 28] }, // 20,5 тыс. подписчиков
 ];

@@ -103,3 +103,24 @@ export const rawAtOut = (t: number) => {
   return c.in + (t - c.out);
 };
 export const sceneAtOut = (t: number) => sceneAt(rawAtOut(t));
+
+/** Output-time ranges where a screen recording is on, merged across cuts (inserted cards break them). */
+const SCREEN_RUNS: [number, number][] = (() => {
+  const runs: [number, number][] = [];
+  for (const c of edl) {
+    for (const sc of scenes) {
+      if (sc.kind !== "screen") continue;
+      const lo = Math.max(c.in, sc.start);
+      const hi = Math.min(c.in + c.dur, sc.end);
+      if (hi <= lo) continue;
+      const a = c.out + (lo - c.in);
+      const b = c.out + (hi - c.in);
+      const last = runs[runs.length - 1];
+      if (last && Math.abs(last[1] - a) < 0.05) last[1] = b;
+      else runs.push([a, b]);
+    }
+  }
+  return runs;
+})();
+/** Start of the continuous screen-recording stretch that contains output time `to`. */
+export const screenRunStart = (to: number) => (SCREEN_RUNS.find(([a, b]) => to >= a - 0.01 && to < b) ?? [to])[0];

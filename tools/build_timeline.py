@@ -118,7 +118,7 @@ for w in kept:
     w["start"], w["end"] = round(T(w["start"]), 3), round(T(w["end"]), 3)
 
 HL = re.compile(r"^(YouTube|Instagram\*|Telegram|ВКонтакте|Дзен|Дзена|VC\.ru|Reels|Claude|ChatGPT|нейросет\w*|систем\w*|\d[\d\s]*|пять|5|сценари\w*)[,.!?:;]*$", re.I)
-MAX_LINE, MAX_GAP = 32, 0.9
+MAX_LINE, MAX_GAP = 32, 1.2
 pages, cur = [], []
 width = lambda ws: sum(len(w["word"]) + 1 for w in ws)
 def flush():

@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, Img, staticFile } from "remotion";
 import { enter, exit, life, lerp, useEditT } from "../anim";
 import { C, EASE, FONT } from "../theme";
 import { Card, Chip, FakeFrame, Label, PLATFORM, PlatformBadge, TextLines } from "./ui";
@@ -764,6 +764,20 @@ export const PromptCard: React.FC<Span & { title: string; items: { t: number; te
           })}
         </div>
       </Card>
+    </div>
+  );
+};
+
+/* ---------- Enlarged plugin name + logo (cropped from the author's own screen recording) ---------- */
+export const PluginBadge: React.FC<Span & { label: string }> = ({ a, b, label }) => {
+  const t = useT(a);
+  const v = life(t, a, b, 0.45, 0.35);
+  return (
+    <div style={{ position: "absolute", left: 232, top: 64, ...rise(v, -18) }}>
+      <div style={{ padding: "22px 28px 18px", borderRadius: 22, background: "#FFFFFF", boxShadow: "0 22px 60px rgba(0,0,0,0.45)", border: `3px solid ${C.accent}` }}>
+        <Img src={staticFile("assets/plugin_logo.png")} style={{ width: 558, height: 126, display: "block" }} />
+        <div style={{ marginTop: 10, fontFamily: FONT, fontWeight: 800, fontSize: 26, letterSpacing: 1.5, textTransform: "uppercase", color: C.mutedDark }}>{label}</div>
+      </div>
     </div>
   );
 };

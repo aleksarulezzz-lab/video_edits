@@ -1,42 +1,46 @@
 [
  {
-  "out": 112.68,
+  "out": 112.12,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
    "step": 1,
    "title": "Определяю, что хочу получить на выходе"
-  }
+  },
+  "nosnap": true
  },
  {
-  "out": 196.52,
+  "out": 195.68,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
    "step": 2,
    "title": "Выбираю тему и собираю структуру"
-  }
+  },
+  "nosnap": true
  },
  {
-  "out": 251.2,
+  "out": 250.16,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
    "step": 0,
    "title": "Где искать тему для видео"
-  }
+  },
+  "nosnap": true
  },
  {
-  "out": 511.52,
+  "out": 510.52,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
    "step": 3,
    "title": "Сценарий с нейросетью"
-  }
+  },
+  "nosnap": true
  },
  {
-  "out": 564.32,
+  "out": 563.32,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
@@ -46,7 +50,7 @@
   "nosnap": true
  },
  {
-  "out": 580.6,
+  "out": 579.6,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
@@ -56,12 +60,13 @@
   "nosnap": true
  },
  {
-  "out": 764.2,
+  "out": 763.6,
   "dur": 1.8,
   "kind": "StepCard",
   "props": {
    "step": 6,
    "title": "Текстовые форматы"
-  }
+  },
+  "nosnap": true
  }
 ]

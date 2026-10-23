@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { C, EASE, FPS } from "../theme";
-import { edl, sceneAt, headCam, screenCam, splitAt, invT } from "../timeline";
+import { edl, sceneAt, headCam, screenCam, splitAt, invT, screenRunStart } from "../timeline";
 import { screenMarks } from "../plan";
 
 const SRC = staticFile("media/raw_sanitized.mp4");
@@ -135,7 +135,7 @@ const FocusDim: React.FC<{ t: number; zoom: number; x: number; y: number; k: num
 
 /** Red ovals that draw themselves around numbers on screen; lives in raw-pixel space so it follows zooms. */
 const ScreenMarks: React.FC<{ t: number; k: number; zoom: number }> = ({ t, k, zoom }) => {
-  const live = screenMarks.filter((m) => t >= m.a - 0.1 && t < m.b + 0.4);
+  const live = screenMarks.filter((m) => t >= m.a - 0.1 && t < m.b + 0.25);
   if (!live.length) return null;
   return (
     <svg width={SCREEN_WIN.w} height={SCREEN_WIN.h} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
@@ -155,7 +155,7 @@ const ScreenMarks: React.FC<{ t: number; k: number; zoom: number }> = ({ t, k, z
           pts.push(`${(cx + Math.cos(th) * ax * wob * grow).toFixed(1)},${(cy + Math.sin(th) * ay * wob * grow).toFixed(1)}`);
         }
         const draw = interpolate(t - m.a, [0, 0.55], [0, 1], { ...clampOpts, easing: EASE.inOut });
-        const fade = interpolate(t, [m.b, m.b + 0.35], [1, 0], clampOpts);
+        const fade = interpolate(t, [m.b, m.b + 0.2], [1, 0], clampOpts);
         const len = 2 * Math.PI * Math.max(ax, ay) * 1.25;
         return (
           <polyline
@@ -249,7 +249,8 @@ const ClipView: React.FC<{ outStart: number; rawIn: number; dur: number }> = ({ 
       {scene.kind === "head" ? (
         <HeadView t={t} />
       ) : (
-        <ScreenView t={t} sceneStart={invT(Math.max(outStart, outStart + (scene.start - rawIn)))} />
+        // entrance animation only where the screen stretch really starts, not at every cut inside it
+        <ScreenView t={t} sceneStart={invT(screenRunStart(outStart + local))} />
       )}
     </ClipVideoContext.Provider>
   );
