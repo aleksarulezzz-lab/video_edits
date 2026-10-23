@@ -445,16 +445,16 @@ const Graphics6: React.FC<{ d: ShortData; t: number }> = ({ d, t }) => {
       </Overlay>
       <Chip t={t} a={W("именно")} b={W("проанализировать") - 0.3} tone="ok">об этом — в своём видео</Chip>
       {/* analysis → own script */}
-      {t > W("проанализировать") - 0.2 && t < W("обращаясь") ? (
-        <div style={{ position: "absolute", left: 0, right: 0, top: 350, display: "flex", justifyContent: "center", alignItems: "center", gap: 10, opacity: fadeOut(t, W("обращаясь")) * ease(t, W("проанализировать") - 0.2, 0.3) }}>
+      {t > W("проанализировать") - 0.2 ? (
+        <div style={{ position: "absolute", left: 0, right: 0, top: 350, display: "flex", justifyContent: "center", alignItems: "center", gap: 10, opacity: ease(t, W("проанализировать") - 0.2, 0.3) }}>
           {own.map(([txt, at]) => <div key={txt} style={{ opacity: pop(t, at), transform: `scale(${0.7 + 0.3 * pop(t, at)})` }}><Pill dark color="#fff">{txt}</Pill></div>)}
           <div style={{ opacity: pop(t, W("работу")) }}><Arrow w={50} color={YELLOW} /></div>
           <div style={{ opacity: pop(t, W("сценарии")), transform: `scale(${0.7 + 0.3 * pop(t, W("сценарии"))})` }}><Pill color={YELLOW}>свой сценарий</Pill></div>
         </div>
       ) : null}
-      <Chip t={t} a={W("обращаясь")} b={W("копировать") - 0.25}>вдохновляться коллегами — да</Chip>
+      <Chip t={t} a={0.3} b={W("копировать") - 0.25}>вдохновляться коллегами — да</Chip>
       {/* ending: no copy-paste */}
-      <Overlay t={t} a={W("копировать") - 0.1} b={d.duration}>
+      <Overlay t={t} a={W("копировать") - 0.1} b={W("ютубу") - 0.25}>
         {(tt) => {
           const a = W("копировать") - 0.1;
           const strike = ease(tt, W("дословно"), 0.35, EASE.inOut);
@@ -621,7 +621,7 @@ export const Short: React.FC<{ id: number }> = ({ id }) => {
   // subtitles are hidden while a full overlay explains the same words
   const overlayRanges: [number, number][] =
     id === 1 ? [[W("одно"), W("причем") - 0.15]] : id === 2 ? [[W("поэтому", 2), W("это") - 0.15]] : id === 3 ? [[W("короткого") - 0.3, W("задаю") - 0.25], [W("задаю"), W("именно") - 0.25]] : id === 4 ? [[W("систему") - 0.4, total]] :
-    id === 6 ? [[W("структуру") - 0.4, W("именно") - 0.25], [W("копировать") - 0.1, total]] :
+    id === 6 ? [[W("копировать") - 0.1, W("ютубу") - 0.25], [W("структуру") - 0.4, W("именно") - 0.25]] :
     id === 7 ? [[W("то") - 0.1, W("нужно") - 0.25], [W("финальное") - 0.1, W("если", 2) - 0.25]] : [];
   const sfx: [number, string][] =
     id === 1 ? [[W("одно"), "whoosh"], [W("каждую"), "click"], [W("один"), "pop"], [W("адаптируешь"), "pop"]] :
