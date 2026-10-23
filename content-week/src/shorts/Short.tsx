@@ -7,6 +7,8 @@ import s2 from "./data/short_2.json";
 import s3 from "./data/short_3.json";
 import s4 from "./data/short_4.json";
 import s5 from "./data/short_5.json";
+import s6 from "./data/short_6.json";
+import s7 from "./data/short_7.json";
 
 /**
  * Vertical 1080×1920 short cut from the long video's raw recording.
@@ -17,7 +19,7 @@ import s5 from "./data/short_5.json";
 type Word = { w: string; s: number; e: number; hl?: boolean };
 type Page = { start: number; end: number; lines: Word[][] };
 type ShortData = { id: number; file: string; title: string[]; clips: { out: number; in: number; dur: number }[]; duration: number; captions: Page[]; pmap: number[][] };
-export const SHORTS: Record<number, ShortData> = { 1: s1, 2: s2, 3: s3, 4: s4, 5: s5 } as unknown as Record<number, ShortData>;
+export const SHORTS: Record<number, ShortData> = { 1: s1, 2: s2, 3: s3, 4: s4, 5: s5, 6: s6, 7: s7 } as unknown as Record<number, ShortData>;
 export const END_CARD = 3.8;
 
 const SRC = staticFile("media/raw_sanitized.mp4");
@@ -45,6 +47,9 @@ const BUBBLE = { cy: 720, r: 240 }; // on screen
 const PIP_SCALE = 0.55;
 const overlayP = (t: number, a: number, b: number) => ease(t, a, 0.3) * fadeOut(t, b + 0.25, 0.3);
 
+// extra framing changes inside long uninterrupted pieces (seconds in the short)
+const PUNCHES: Record<number, number[]> = { 7: [22.75, 32.65, 49.15] };
+
 const Footage: React.FC<{ d: ShortData; pip: (t: number) => number }> = ({ d, pip }) => (
   <>
     {d.clips.map((c, i) => {
@@ -53,14 +58,14 @@ const Footage: React.FC<{ d: ShortData; pip: (t: number) => number }> = ({ d, pi
       if (n <= 0) return null;
       return (
         <Sequence key={i} from={from} durationInFrames={n} premountFor={FPS}>
-          <ClipLayer clip={c} idx={d.pmap.findIndex((p) => c.out < p[3] - 0.001)} pmap={d.pmap} n={n} pip={pip} />
+          <ClipLayer clip={c} idx={d.pmap.findIndex((p) => c.out < p[3] - 0.001)} pmap={d.pmap} punches={PUNCHES[d.id] ?? []} n={n} pip={pip} />
         </Sequence>
       );
     })}
   </>
 );
 
-const ClipLayer: React.FC<{ clip: { out: number; in: number; dur: number }; idx: number; pmap: number[][]; n: number; pip: (t: number) => number }> = ({ clip, idx, pmap, n, pip }) => {
+const ClipLayer: React.FC<{ clip: { out: number; in: number; dur: number }; idx: number; pmap: number[][]; punches: number[]; n: number; pip: (t: number) => number }> = ({ clip, idx, pmap, punches, n, pip }) => {
   const f = useCurrentFrame();
   const p = pip(clip.out + f / FPS);
   // face centre sits at ~470 px inside the frame; move it to the bubble centre while shrinking
@@ -68,8 +73,12 @@ const ClipLayer: React.FC<{ clip: { out: number; in: number; dur: number }; idx:
   const dy = (BUBBLE.cy - FRAME.y - 470) * p;
   const r = interpolate(p, [0, 1], [1400, BUBBLE.r / PIP_SCALE]);
   // jump-cut framing: alternate medium / close on every jump cut (idx = piece), plus a slow push
-  const [, o0, , o1] = pmap[idx];
-  const zoom = (idx % 2 ? 1.14 : 1.0) + 0.03 * Math.min(1, (clip.out + f / FPS - o0) / (o1 - o0));
+  const now = clip.out + f / FPS;
+  const [, p0, , o1] = pmap[idx];
+  const inside = punches.filter((x) => x > p0 && x <= now);
+  const o0 = inside.length ? inside[inside.length - 1] : p0;
+  const k = idx + inside.length;
+  const zoom = (k % 2 ? 1.14 : 1.0) + 0.03 * Math.min(1, (now - o0) / (o1 - o0));
   const s = FRAME.w / CROP.w;
   const vol = (fr: number) => Math.min(1, (fr + 1) / 2, (n - fr) / 2);
   const video = (style: React.CSSProperties, muted: boolean) => (
@@ -354,6 +363,8 @@ const Graphics: React.FC<{ d: ShortData; t: number }> = ({ d, t }) => {
       </>
     );
   }
+  if (d.id === 6) return <Graphics6 d={d} t={t} />;
+  if (d.id === 7) return <Graphics7 d={d} t={t} />;
   // id 5
   const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
   const filled = W("видео") ;
@@ -376,6 +387,164 @@ const Graphics: React.FC<{ d: ShortData; t: number }> = ({ d, t }) => {
       <Chip t={t} a={W("один")} b={W("знаю", 2) - 0.2}>1 · 3 · 5 новых роликов — как пойдёт</Chip>
       <Chip t={t} a={W("знаю", 2)} b={W("постепенно") - 0.4} tone="ok">базовая история закрыта</Chip>
       <Row t={t} y={352} gap={18} items={["youtube", "telegram", "vk", "dzen"].map((id, i) => ({ at: t >= W("постепенно") ? W("постепенно") + i * 0.5 : -1, node: <Tile id={id} size={60} /> }))} />
+    </>
+  );
+};
+
+/* ---------- 04 «Не копируй чужие видео»: copy vs. own analysis ---------- */
+const Pill: React.FC<{ children: React.ReactNode; color?: string; dark?: boolean }> = ({ children, color = "#fff", dark }) => (
+  <div style={{ padding: "12px 22px", borderRadius: 16, background: dark ? "rgba(12,13,16,0.86)" : color, border: dark ? `3px solid ${color}` : "none", fontFamily: FONT, fontWeight: 800, fontSize: 32, color: dark ? "#fff" : "#111", whiteSpace: "nowrap" }}>{children}</div>
+);
+const Arrow: React.FC<{ w?: number; color?: string }> = ({ w = 60, color = "#fff" }) => (
+  <svg width={w} height={30} viewBox={`0 0 ${w} 30`}><path d={`M2 15 H${w - 12} M${w - 22} 5 L${w - 4} 15 L${w - 22} 25`} stroke={color} strokeWidth={4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+);
+const MiniVideo: React.FC<{ w?: number; h?: number; color?: string; label?: string; dim?: boolean }> = ({ w = 200, h = 112, color = "#fff", label, dim }) => (
+  <div style={{ width: w, height: h, borderRadius: 14, background: dim ? "#24272D" : "linear-gradient(160deg,#2A2E36,#14161A)", border: `3px solid ${color}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, opacity: dim ? 0.7 : 1 }}>
+    <div style={{ width: 0, height: 0, borderTop: "12px solid transparent", borderBottom: "12px solid transparent", borderLeft: `20px solid ${color}`, marginLeft: 4 }} />
+    {label ? <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 20, color: "#ddd" }}>{label}</div> : null}
+  </div>
+);
+const Key: React.FC<{ k: string }> = ({ k }) => (
+  <div style={{ display: "flex", gap: 10 }}>
+    {["Ctrl", k].map((x) => (
+      <div key={x} style={{ minWidth: 96, padding: "18px 20px", borderRadius: 16, background: "#F5F2EC", boxShadow: "0 8px 0 #9A968E", fontFamily: FONT, fontWeight: 800, fontSize: 40, color: "#111", textAlign: "center" }}>{x}</div>
+    ))}
+  </div>
+);
+const pop = (t: number, a: number) => ease(t, a, 0.35, EASE.pop);
+
+const Graphics6: React.FC<{ d: ShortData; t: number }> = ({ d, t }) => {
+  const W = (w: string, n = 1) => wordAt(d, w, n);
+  const hookEnd = W("вы") - 0.1;
+  const own = [["своими глазами", W("глазами")], ["нейросеть", W("нейросеть")]] as [string, number][];
+  return (
+    <>
+      {/* hook: the same video said again in the same words */}
+      {t < hookEnd + 0.3 ? (
+        <div style={{ position: "absolute", left: 0, right: 0, top: 330, display: "flex", justifyContent: "center", alignItems: "center", gap: 22, opacity: fadeOut(t, hookEnd + 0.3) }}>
+          <div style={{ opacity: pop(t, W("второе")), transform: `scale(${0.7 + 0.3 * pop(t, W("второе"))})` }}><MiniVideo label="видео на тему" /></div>
+          <div style={{ opacity: pop(t, W("словами")) }}><Arrow /></div>
+          <div style={{ position: "relative", opacity: pop(t, W("словами")), transform: `scale(${0.7 + 0.3 * pop(t, W("словами"))})` }}>
+            <MiniVideo label="те же слова" dim />
+            <div style={{ position: "absolute", left: -6, right: -6, top: 30, transform: `rotate(-12deg) scale(${pop(t, W("явно"))})`, opacity: pop(t, W("явно")), padding: "4px 0", border: "4px solid #FF4D3D", borderRadius: 10, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 30, color: "#FF4D3D", background: "rgba(12,13,16,0.75)" }}>КОПИЯ</div>
+          </div>
+        </div>
+      ) : null}
+      <Overlay t={t} a={W("структуру") - 0.4} b={W("именно") - 0.25}>
+        {(tt) => (
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 26 }}>
+            <Big size={46} color={YELLOW}>в чужом видео смотрим</Big>
+            {[["Структуру", W("структуру"), "#fff"], ["Согласны ли вы как эксперт", W("эксперт"), "#fff"], ["Свой подход к проблеме", W("подход"), YELLOW]].map(([txt, at, col], i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 20, opacity: pop(tt, at as number), transform: `translateX(${(1 - pop(tt, at as number)) * 40}px)` }}>
+                <Mark ok />
+                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 50, color: col as string }}>{txt as string}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Overlay>
+      <Chip t={t} a={W("именно")} b={W("проанализировать") - 0.3} tone="ok">об этом — в своём видео</Chip>
+      {/* analysis → own script */}
+      {t > W("проанализировать") - 0.2 && t < W("обращаясь") ? (
+        <div style={{ position: "absolute", left: 0, right: 0, top: 350, display: "flex", justifyContent: "center", alignItems: "center", gap: 10, opacity: fadeOut(t, W("обращаясь")) * ease(t, W("проанализировать") - 0.2, 0.3) }}>
+          {own.map(([txt, at]) => <div key={txt} style={{ opacity: pop(t, at), transform: `scale(${0.7 + 0.3 * pop(t, at)})` }}><Pill dark color="#fff">{txt}</Pill></div>)}
+          <div style={{ opacity: pop(t, W("работу")) }}><Arrow w={50} color={YELLOW} /></div>
+          <div style={{ opacity: pop(t, W("сценарии")), transform: `scale(${0.7 + 0.3 * pop(t, W("сценарии"))})` }}><Pill color={YELLOW}>свой сценарий</Pill></div>
+        </div>
+      ) : null}
+      <Chip t={t} a={W("обращаясь")} b={W("копировать") - 0.25}>вдохновляться коллегами — да</Chip>
+      {/* ending: no copy-paste */}
+      <Overlay t={t} a={W("копировать") - 0.1} b={d.duration}>
+        {(tt) => {
+          const a = W("копировать") - 0.1;
+          const strike = ease(tt, W("дословно"), 0.35, EASE.inOut);
+          return (
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 34 }}>
+              <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 22, opacity: pop(tt, a) }}>
+                <Key k="C" />
+                <Arrow w={56} />
+                <Key k="V" />
+                <div style={{ position: "absolute", left: -20, top: "50%", height: 10, width: `${(100 + 8) * strike}%`, background: "#FF4D3D", borderRadius: 6, transform: "rotate(-6deg)" }} />
+              </div>
+              <div style={{ opacity: pop(tt, W("однозначно")), transform: `scale(${0.8 + 0.2 * pop(tt, W("однозначно"))}) rotate(-2deg)`, padding: "14px 30px", background: "#FF4D3D" }}>
+                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 54, color: "#fff" }}>НЕ КОПИРУЙТЕ ДОСЛОВНО</div>
+              </div>
+            </div>
+          );
+        }}
+      </Overlay>
+    </>
+  );
+};
+
+/* ---------- 05 «Нейросеть не думает за тебя»: weak source → weak reels, the author decides ---------- */
+const Graphics7: React.FC<{ d: ShortData; t: number }> = ({ d, t }) => {
+  const W = (w: string, n = 1) => wordAt(d, w, n);
+  const flaws = [["нет структуры", W("структурировано")], ["тема не раскрыта", W("раскрывать")], ["нет пользы", W("пользу")]] as [string, number][];
+  const good = [["Понятная тема", W("понятную")], ["Польза", W("пользу", 2)], ["Понятный результат", W("понятный")]] as [string, number][];
+  return (
+    <>
+      <Chip t={t} a={W("рутинных")} b={W("но") - 0.15} tone="ok">рутина → нейросеть</Chip>
+      <Chip t={t} a={W("необходимости")} b={W("если") - 0.1}>думать — по-прежнему вам</Chip>
+      {/* weak source: flaws stack up */}
+      <div style={{ position: "absolute", left: 0, right: 0, top: 350, display: "flex", justifyContent: "center", gap: 12, opacity: t < W("то") - 0.3 ? 1 : fadeOut(t, W("то")) }}>
+        {flaws.map(([txt, at]) => (
+          <div key={txt} style={{ opacity: t < at - 0.1 ? 0 : pop(t, at), transform: `translateY(${(1 - pop(t, at)) * 16}px)`, display: "flex", alignItems: "center", gap: 10, padding: "10px 18px", borderRadius: 14, background: "rgba(12,13,16,0.86)", border: "3px solid #FF4D3D", fontFamily: FONT, fontWeight: 800, fontSize: 30, color: "#fff", whiteSpace: "nowrap" }}>
+            <Mark ok={false} />{txt}
+          </div>
+        ))}
+      </div>
+      <Overlay t={t} a={W("то") - 0.1} b={W("нужно") - 0.25}>
+        {(tt) => {
+          const a = W("то") - 0.1;
+          return (
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 22 }}>
+              <div style={{ opacity: pop(tt, a) }}><MiniVideo w={300} h={170} color="#777" label="слабое исходное видео" dim /></div>
+              <div style={{ opacity: pop(tt, W("сделаете")), transform: "rotate(90deg)" }}><Arrow w={60} color="#999" /></div>
+              <div style={{ display: "flex", gap: 14 }}>
+                {[0, 1, 2, 3, 4].map((i) => <div key={i} style={{ opacity: pop(tt, W("посредственных") + i * 0.1) }}><VTile w={110} h={170} color="#6B6F78" /></div>)}
+              </div>
+              <div style={{ opacity: pop(tt, W("дадут")), display: "flex", alignItems: "center", gap: 14 }}>
+                <Mark ok={false} />
+                <Big size={46} color="#FF8A7A">5 посредственных роликов</Big>
+              </div>
+            </div>
+          );
+        }}
+      </Overlay>
+      {/* a good source */}
+      {t > W("понятную") - 0.2 && t < W("когда") ? (
+        <div style={{ position: "absolute", left: 0, right: 0, top: 350, display: "flex", justifyContent: "center", gap: 12, opacity: fadeOut(t, W("когда")) }}>
+          {good.map(([txt, at]) => (
+            <div key={txt} style={{ opacity: t < at - 0.1 ? 0 : pop(t, at), transform: `scale(${0.7 + 0.3 * pop(t, at)})`, display: "flex", alignItems: "center", gap: 10, padding: "10px 18px", borderRadius: 14, background: "rgba(12,13,16,0.86)", border: "3px solid #2ECC71", fontFamily: FONT, fontWeight: 800, fontSize: 30, color: "#fff", whiteSpace: "nowrap" }}>
+              <Mark ok />{txt}
+            </div>
+          ))}
+        </div>
+      ) : null}
+      <Chip t={t} a={W("нейросеть")} b={W("финальное") - 0.3}>нейросеть смонтировала</Chip>
+      <Overlay t={t} a={W("финальное") - 0.1} b={W("если", 2) - 0.25}>
+        {(tt) => {
+          const steps = [["ИИ помогает создать", W("финальное") - 0.1, "#8EA6FF"], ["Автор проверяет", W("интересным"), "#fff"], ["Автор решает,\nпубликовать ли", W("принимайте"), YELLOW]] as [string, number, string][];
+          return (
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+              {steps.map(([txt, at, col], i) => (
+                <React.Fragment key={i}>
+                  {i ? <div style={{ opacity: pop(tt, at), transform: "rotate(90deg)" }}><Arrow w={44} color="#888" /></div> : null}
+                  <div style={{ opacity: pop(tt, at), transform: `scale(${0.8 + 0.2 * pop(tt, at)})`, padding: "16px 34px", borderRadius: 18, background: i === 2 ? YELLOW : "rgba(30,32,38,0.95)", border: `3px solid ${col}`, fontFamily: FONT, fontWeight: 800, fontSize: 44, lineHeight: 1.15, textAlign: "center", whiteSpace: "pre-line", color: i === 2 ? "#111" : "#fff" }}>{txt}</div>
+                </React.Fragment>
+              ))}
+            </div>
+          );
+        }}
+      </Overlay>
+      <Chip t={t} a={W("непонятно")} b={W("докрутить") - 0.15} tone="no">аудитории непонятно?</Chip>
+      {t > W("докрутить") - 0.2 ? (
+        <div style={{ position: "absolute", left: 0, right: 0, top: 360, display: "flex", justifyContent: "center", gap: 14 }}>
+          <div style={{ opacity: pop(t, W("докрутить")) }}><Pill dark color="#2ECC71">докрутить с нейросетью</Pill></div>
+          <div style={{ opacity: pop(t, W("отказаться")) }}><Pill dark color="#FF4D3D">не публиковать</Pill></div>
+        </div>
+      ) : null}
     </>
   );
 };
@@ -451,12 +620,16 @@ export const Short: React.FC<{ id: number }> = ({ id }) => {
   const W = (w: string, n = 1) => wordAt(d, w, n);
   // subtitles are hidden while a full overlay explains the same words
   const overlayRanges: [number, number][] =
-    id === 1 ? [[W("одно"), W("причем") - 0.15]] : id === 2 ? [[W("поэтому", 2), W("это") - 0.15]] : id === 3 ? [[W("короткого") - 0.3, W("задаю") - 0.25], [W("задаю"), W("именно") - 0.25]] : id === 4 ? [[W("систему") - 0.4, total]] : [];
+    id === 1 ? [[W("одно"), W("причем") - 0.15]] : id === 2 ? [[W("поэтому", 2), W("это") - 0.15]] : id === 3 ? [[W("короткого") - 0.3, W("задаю") - 0.25], [W("задаю"), W("именно") - 0.25]] : id === 4 ? [[W("систему") - 0.4, total]] :
+    id === 6 ? [[W("структуру") - 0.4, W("именно") - 0.25], [W("копировать") - 0.1, total]] :
+    id === 7 ? [[W("то") - 0.1, W("нужно") - 0.25], [W("финальное") - 0.1, W("если", 2) - 0.25]] : [];
   const sfx: [number, string][] =
     id === 1 ? [[W("одно"), "whoosh"], [W("каждую"), "click"], [W("один"), "pop"], [W("адаптируешь"), "pop"]] :
     id === 2 ? [[0.6, "click"], [W("поэтому", 2), "whoosh"], [W("это"), "pop"]] :
     id === 3 ? [[0.3, "click"], [W("короткого") - 0.3, "whoosh"], [W("задаю"), "whoosh"], [W("именно"), "pop"]] :
     id === 4 ? [[W("нюанс"), "click"], [W("систему") - 0.4, "whoosh"]] :
+    id === 6 ? [[W("второе"), "pop"], [W("явно"), "click"], [W("структуру") - 0.4, "whoosh"], [W("сценарии"), "pop"], [W("копировать") - 0.1, "whoosh"], [W("однозначно"), "pop"]] :
+    id === 7 ? [[W("рутинных"), "click"], [W("структурировано"), "click"], [W("то") - 0.1, "whoosh"], [W("понятную"), "pop"], [W("финальное") - 0.1, "whoosh"], [W("принимайте"), "pop"], [W("докрутить"), "click"]] :
     [[W("видео"), "pop"], [W("свободна"), "pop"], [W("постепенно"), "click"]];
   return (
     <AbsoluteFill style={{ backgroundColor: "#0B0C0F" }}>

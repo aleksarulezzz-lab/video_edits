@@ -63,11 +63,11 @@ for sh in spec["shorts"]:
             start = quietest(ws[drop - 1]["e"] - 0.04, ws[drop]["s"] + 0.03)
         else:
             start = quietest(ws[0]["s"] - 0.25, ws[0]["s"] + 0.02)
-        end = quietest(ws[-1]["e"] - 0.02, ws[-1]["e"] + 0.25)
+        end = seg["end_at"] if "end_at" in seg else quietest(ws[-1]["e"] - 0.02, ws[-1]["e"] + 0.25)
         # jump cuts: shorten long pauses to ~0.36 s
         cur = start
         for p0, p1 in pauses(start, end):
-            if p0 - cur > 0.2:
+            if p0 - cur > 0.2 and end - p1 > 0.3:  # no sliver pieces at the segment end
                 pieces.append((cur, p0 + 0.18))
                 cur = p1 - 0.18
         pieces.append((cur, end))
