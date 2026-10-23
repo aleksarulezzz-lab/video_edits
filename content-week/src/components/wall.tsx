@@ -381,3 +381,102 @@ export const Disclaimer: React.FC<Span> = ({ a, b }) => {
   );
 };
 
+
+/* ---------- Guide mockup: a phone on the wall, the guide's pages being swiped ---------- */
+const GUIDE_PAGES = [
+  "Определяю, что хочу получить на выходе",
+  "Выбираю тему и собираю структуру",
+  "Сценарий с нейросетью",
+  "Записываю длинное видео",
+  "Пять коротких роликов",
+  "Текстовые форматы",
+];
+
+const GuideCover: React.FC = () => (
+  <div style={{ width: "100%", height: "100%", background: `linear-gradient(165deg, #1B1F26 0%, ${C.ink} 70%)`, padding: "44px 26px 26px", boxSizing: "border-box", display: "flex", flexDirection: "column", fontFamily: FONT }}>
+    <div style={{ alignSelf: "flex-start", padding: "6px 14px", borderRadius: 999, background: C.accent, color: "#fff", fontWeight: 800, fontSize: 15, letterSpacing: 2 }}>ГАЙД</div>
+    <div style={{ marginTop: 22, fontWeight: 800, fontSize: 31, lineHeight: 1.08, color: C.text, letterSpacing: -0.5 }}>Как из одного видео сделать контент на неделю</div>
+    <div style={{ marginTop: 14, fontWeight: 600, fontSize: 16, color: C.muted }}>6 шагов · промпты · чек-лист</div>
+    {/* one long video feeding five shorts */}
+    <svg width="100%" height="190" viewBox="0 0 254 190" style={{ marginTop: 26 }}>
+      <rect x="62" y="6" width="130" height="64" rx="10" fill="none" stroke={C.text} strokeOpacity="0.8" strokeWidth="2.5" />
+      <path d="M118 28 v20 l17-10z" fill={C.text} fillOpacity="0.8" />
+      {[0, 1, 2, 3, 4].map((i) => (
+        <g key={i}>
+          <path d={`M127 70 C127 98 ${22 + i * 52} 96 ${22 + i * 52} 116`} fill="none" stroke={C.accent} strokeWidth="2" />
+          <rect x={8 + i * 52} y="116" width="28" height="50" rx="6" fill="none" stroke={C.accent} strokeWidth="2.5" />
+        </g>
+      ))}
+    </svg>
+    <div style={{ marginTop: "auto", fontWeight: 700, fontSize: 16, color: C.paperDim }}>Александра Рулёва</div>
+  </div>
+);
+
+const GuidePage: React.FC<{ n: number; title: string }> = ({ n, title }) => (
+  <div style={{ width: "100%", height: "100%", background: C.paper, padding: "46px 26px 26px", boxSizing: "border-box", fontFamily: FONT, color: C.textDark }}>
+    <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: 2, color: C.accent }}>ШАГ {n}</div>
+    <div style={{ marginTop: 10, fontWeight: 800, fontSize: 27, lineHeight: 1.1, letterSpacing: -0.4 }}>{title}</div>
+    <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 11 }}>
+      {[0.95, 0.85, 0.9, 0.6].map((w, i) => (
+        <div key={i} style={{ height: 9, width: `${w * 100}%`, borderRadius: 9, background: "rgba(0,0,0,0.12)" }} />
+      ))}
+    </div>
+    <div style={{ marginTop: 26, display: "flex", flexDirection: "column", gap: 14 }}>
+      {[0.7, 0.8, 0.55].map((w, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${C.accent}`, flexShrink: 0 }} />
+          <div style={{ height: 9, width: `${w * 100}%`, borderRadius: 9, background: "rgba(0,0,0,0.12)" }} />
+        </div>
+      ))}
+    </div>
+    <div style={{ position: "absolute", left: 26, right: 26, bottom: 22, display: "flex", gap: 6 }}>
+      {GUIDE_PAGES.map((_, i) => (
+        <div key={i} style={{ flex: 1, height: 4, borderRadius: 4, background: i < n ? C.accent : "rgba(0,0,0,0.12)" }} />
+      ))}
+    </div>
+  </div>
+);
+
+export const GuidePhone: React.FC<Span & { swipeAt: number; noteAt: number }> = ({ a, b, swipeAt, noteAt }) => {
+  const t = useT(a);
+  const v = life(t, a, b, 0.6, 0.45);
+  const label = enter(t, a + 0.35, 0.5);
+  const STEP = 1.05;
+  // page position: 0 = cover, then one page per STEP seconds, each swipe eased
+  const raw = Math.max(0, (t - swipeAt) / STEP);
+  const k = Math.min(GUIDE_PAGES.length, Math.floor(raw) + EASE.inOut(Math.min(1, (raw % 1) / 0.45)));
+  const pos = t < swipeAt ? 0 : Math.min(GUIDE_PAGES.length, k);
+  const SCREEN_W = 300;
+  const swipePhase = t >= swipeAt && raw < GUIDE_PAGES.length ? Math.min(1, (raw % 1) / 0.45) : 1;
+  const W_ = 330;
+  const H_ = 660;
+  return (
+    <WallBox justify="flex-start">
+      <div style={{ display: "flex", alignItems: "center", gap: 14, ...slide(label * exit(t, b - 0.45, 0.45), 16) }}>
+        <PlatformBadge id="telegram" size={50} />
+        <div style={{ fontWeight: 800, fontSize: 30, color: INK }}>гайд в Telegram-канале</div>
+      </div>
+      <div style={{ marginTop: 24, marginLeft: 70, opacity: v, transform: `translateY(${(1 - v) * 60}px) rotate(${(1 - v) * -4}deg)` }}>
+        <div style={{ position: "relative", width: W_, height: H_, borderRadius: 52, background: "#0B0C0E", boxShadow: "0 30px 70px rgba(0,0,0,0.35), inset 0 0 0 2px #2A2E35", padding: 15, boxSizing: "border-box" }}>
+          <div style={{ position: "relative", width: SCREEN_W, height: H_ - 30, borderRadius: 40, overflow: "hidden", background: C.ink }}>
+            <div style={{ position: "absolute", top: 0, left: 0, height: "100%", display: "flex", transform: `translateX(${-pos * SCREEN_W}px)` }}>
+              <div style={{ width: SCREEN_W, height: "100%", position: "relative", flexShrink: 0 }}><GuideCover /></div>
+              {GUIDE_PAGES.map((p, i) => (
+                <div key={i} style={{ width: SCREEN_W, height: "100%", position: "relative", flexShrink: 0 }}><GuidePage n={i + 1} title={p} /></div>
+              ))}
+            </div>
+            {/* dynamic island */}
+            <div style={{ position: "absolute", top: 12, left: "50%", width: 92, height: 26, marginLeft: -46, borderRadius: 20, background: "#000" }} />
+            {/* finger swipe hint */}
+            {t >= swipeAt && raw < GUIDE_PAGES.length ? (
+              <div style={{ position: "absolute", top: 400, left: 230 - 160 * swipePhase, width: 46, height: 46, borderRadius: 46, background: "rgba(255,255,255,0.55)", boxShadow: "0 0 0 8px rgba(255,255,255,0.18)", opacity: Math.sin(Math.PI * swipePhase) }} />
+            ) : null}
+          </div>
+        </div>
+      </div>
+      <div style={{ marginTop: 26, ...slide(enter(t, noteAt, 0.5) * exit(t, b - 0.45, 0.45), 16) }}>
+        <div style={{ display: "inline-block", padding: "12px 22px", borderRadius: 16, background: ACCENT, color: "#fff", fontWeight: 800, fontSize: 30 }}>ссылка — в описании к видео</div>
+      </div>
+    </WallBox>
+  );
+};

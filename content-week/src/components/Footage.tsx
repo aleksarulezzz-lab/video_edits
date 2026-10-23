@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { C, EASE, FPS } from "../theme";
 import { edl, sceneAt, headCam, screenCam, splitAt, invT } from "../timeline";
+import { screenMarks } from "../plan";
 
 const SRC = staticFile("media/raw_sanitized.mp4");
 const RAW_W = 1440;
@@ -100,8 +101,10 @@ const ScreenView: React.FC<{ t: number; sceneStart: number }> = ({ t, sceneStart
           }}
         >
           <OffthreadVideoLayer top={0} width={SCREEN_WIN.w} height={SCREEN_WIN.h} />
+          <ScreenMarks t={t} k={k} zoom={zoom} />
         </div>
         {cam.dim > 0 ? <FocusDim t={t} zoom={zoom} x={x} y={y} k={k} /> : null}
+        <PipBubble appear={interpolate(t - sceneStart, [0.1, 0.5], [0, 1], { ...clampOpts, easing: EASE.out })} />
       </div>
     </AbsoluteFill>
   );
@@ -130,15 +133,100 @@ const FocusDim: React.FC<{ t: number; zoom: number; x: number; y: number; k: num
   );
 };
 
+/** Red ovals that draw themselves around numbers on screen; lives in raw-pixel space so it follows zooms. */
+const ScreenMarks: React.FC<{ t: number; k: number; zoom: number }> = ({ t, k, zoom }) => {
+  const live = screenMarks.filter((m) => t >= m.a - 0.1 && t < m.b + 0.4);
+  if (!live.length) return null;
+  return (
+    <svg width={SCREEN_WIN.w} height={SCREEN_WIN.h} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
+      {live.map((m, i) => {
+        const [rx0, ry0, rw, rh] = m.rect;
+        const cx = (rx0 + rw / 2) * k;
+        const cy = (ry0 + rh / 2) * k;
+        const ax = (rw / 2 + 16) * k;
+        const ay = (rh / 2 + 12) * k;
+        // slightly irregular loop that overshoots its start, like a marker stroke
+        const pts: string[] = [];
+        const N = 64;
+        for (let j = 0; j <= N; j++) {
+          const th = -2.3 + (j / N) * (Math.PI * 2 + 0.55);
+          const wob = 1 + 0.05 * Math.sin(th * 3 + i) + 0.03 * Math.cos(th * 5);
+          const grow = 1 + 0.06 * (j / N);
+          pts.push(`${(cx + Math.cos(th) * ax * wob * grow).toFixed(1)},${(cy + Math.sin(th) * ay * wob * grow).toFixed(1)}`);
+        }
+        const draw = interpolate(t - m.a, [0, 0.55], [0, 1], { ...clampOpts, easing: EASE.inOut });
+        const fade = interpolate(t, [m.b, m.b + 0.35], [1, 0], clampOpts);
+        const len = 2 * Math.PI * Math.max(ax, ay) * 1.25;
+        return (
+          <polyline
+            key={i}
+            points={pts.join(" ")}
+            fill="none"
+            stroke="#FF2D1F"
+            strokeWidth={4.2 / Math.sqrt(zoom)}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray={len}
+            strokeDashoffset={len * (1 - draw)}
+            opacity={fade}
+          />
+        );
+      })}
+    </svg>
+  );
+};
+
+// The author's camera window, burned into the top-right of every screen recording.
+const PIP = { x: 1200, y: 0, w: 240, h: 118 }; // raw px, above the name label
+const PIP_W = 344;
+const PIP_S = PIP_W / PIP.w;
+
+/**
+ * A clean copy of that camera window, docked to the window corner at a fixed size. It covers
+ * the burned-in original, so zooming into the screen never shows a cropped face.
+ */
+const PipBubble: React.FC<{ appear: number }> = ({ appear }) => (
+  <div
+    style={{
+      position: "absolute",
+      right: 0,
+      top: 0,
+      width: PIP_W,
+      height: PIP.h * PIP_S,
+      overflow: "hidden",
+      borderBottomLeftRadius: 22,
+      boxShadow: "-8px 10px 30px rgba(0,0,0,0.35)",
+      background: C.ink,
+    }}
+  >
+    <div style={{ position: "absolute", inset: 0, opacity: appear, transform: `scale(${0.92 + 0.08 * appear})`, transformOrigin: "100% 0" }}>
+      <OffthreadVideoLayer
+        muted
+        top={-PIP.y * PIP_S}
+        left={-PIP.x * PIP_S}
+        width={1440 * PIP_S}
+        height={900 * PIP_S}
+      />
+    </div>
+  </div>
+);
+
 // The video element itself; the clip's <Sequence> handles timing.
-const OffthreadVideoLayer: React.FC<{ top: number; width: number; height: number }> = ({ top, width, height }) => (
+const OffthreadVideoLayer: React.FC<{ top: number; left?: number; width: number; height: number; muted?: boolean }> = ({
+  top,
+  left = 0,
+  width,
+  height,
+  muted,
+}) => (
   <ClipVideoContext.Consumer>
     {(clip) => (
       <OffthreadVideo
         src={SRC}
         trimBefore={clip.trim}
-        volume={clip.volume}
-        style={{ position: "absolute", left: 0, top, width, height }}
+        volume={muted ? 0 : clip.volume}
+        muted={muted}
+        style={{ position: "absolute", left, top, width, height, maxWidth: "none" }}
       />
     )}
   </ClipVideoContext.Consumer>

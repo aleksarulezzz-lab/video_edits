@@ -46,5 +46,71 @@
    "why": "дотянуть слово «решение» до конца"
   }
  ],
- "inserts": []
+ "inserts": [
+  {
+   "at": 112.82,
+   "dur": 1.8,
+   "kind": "StepCard",
+   "props": {
+    "step": 1,
+    "title": "Определяю, что хочу получить на выходе"
+   }
+  },
+  {
+   "at": 194.68,
+   "dur": 1.8,
+   "kind": "StepCard",
+   "props": {
+    "step": 2,
+    "title": "Выбираю тему и собираю структуру"
+   }
+  },
+  {
+   "at": 247.88,
+   "dur": 1.8,
+   "kind": "StepCard",
+   "props": {
+    "step": 0,
+    "title": "Где искать тему для видео"
+   }
+  },
+  {
+   "at": 512.35,
+   "dur": 1.8,
+   "kind": "StepCard",
+   "props": {
+    "step": 3,
+    "title": "Сценарий с нейросетью"
+   }
+  },
+  {
+   "at": 563.28,
+   "dur": 1.8,
+   "kind": "StepCard",
+   "props": {
+    "step": 4,
+    "title": "Записываю длинное видео целиком"
+   },
+   "nosnap": true
+  },
+  {
+   "at": 577.76,
+   "dur": 1.8,
+   "kind": "StepCard",
+   "props": {
+    "step": 5,
+    "title": "Пять коротких роликов"
+   },
+   "nosnap": true
+  },
+  {
+   "at": 762.28,
+   "dur": 1.8,
+   "kind": "StepCard",
+   "props": {
+    "step": 6,
+    "title": "Текстовые форматы"
+   }
+  }
+ ]
 }

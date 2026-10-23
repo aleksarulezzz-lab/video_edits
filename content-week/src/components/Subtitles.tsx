@@ -3,9 +3,9 @@ import { useCurrentFrame } from "remotion";
 import captionsJson from "../data/captions.json";
 import { overlays } from "../plan";
 import { C, FONT, FPS } from "../theme";
-import { invT, sceneAtOut, splitAt } from "../timeline";
+import { INSERTS, invT, sceneAtOut, splitAt } from "../timeline";
 
-type Page = { start: number; end: number; lines: { w: string; hl: boolean }[][] };
+type Page = { start: number; end: number; lines: { w: string; hl: boolean; s: number; e: number }[][] };
 const pages = captionsJson as Page[];
 
 const fullAt = (to: number) => {
@@ -16,7 +16,7 @@ const fullAt = (to: number) => {
 export const Subtitles: React.FC = () => {
   const t = useCurrentFrame() / FPS;
   const page = pages.find((p) => t >= p.start && t < p.end);
-  if (!page) return null;
+  if (!page || INSERTS.some((c) => t >= c.out && t < c.out + c.dur)) return null;
   const screen = sceneAtOut(t).kind === "screen";
   const split = splitAt(invT(t)) > 0.5;
   const full = fullAt(t);
@@ -50,7 +50,8 @@ export const Subtitles: React.FC = () => {
         {page.lines.map((ln, i) => (
           <div key={i}>
             {ln.map((w, j) => (
-              <span key={j} style={{ color: w.hl ? "#FFB199" : C.text }}>
+              // the word being spoken lights up, keywords keep a softer tint
+              <span key={j} style={{ color: t >= w.s - 0.04 && t < Math.max(w.e, w.s + 0.18) ? "#FF7A5C" : w.hl ? "#FFB199" : C.text }}>
                 {w.w}
                 {j < ln.length - 1 ? " " : ""}
               </span>

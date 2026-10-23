@@ -2,6 +2,7 @@ import { interpolate } from "remotion";
 import edlJson from "./data/edl.json";
 import insertsJson from "./data/inserts.json";
 import timemapJson from "./data/timemap.json";
+import autocutsJson from "./data/autocuts.json";
 import scenesJson from "./data/scenes.json";
 import { camMoves, screenKeys, splits } from "./plan";
 import { EASE } from "./theme";
@@ -48,10 +49,13 @@ const rangeWeight = (t: number, a: number, b: number, ramp: number) =>
   );
 
 const BASE = { zoom: 1.08, ox: 1000, oy: 430 };
+const AUTOCUTS = autocutsJson as [number, number][];
 
 export const headCam = (t: number) => {
   // Slow breathing push so static stretches never feel frozen.
   let zoom = BASE.zoom + 0.025 * (0.5 - 0.5 * Math.cos((t / 24) * Math.PI * 2));
+  // second "camera": a tighter framing cut in on sentence pauses
+  if (AUTOCUTS.some(([a, b]) => t >= a && t < b)) zoom += 0.09;
   let ox = BASE.ox;
   let oy = BASE.oy;
   for (const m of camMoves) {

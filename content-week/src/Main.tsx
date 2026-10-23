@@ -4,6 +4,8 @@ import { Footage } from "./components/Footage";
 import * as G from "./components/graphics";
 import * as Wall from "./components/wall";
 import { Subtitles } from "./components/Subtitles";
+import { StepCard } from "./components/cards";
+import { INSERTS, T } from "./timeline";
 import { extraSfx, overlays } from "./plan";
 import { C, FPS } from "./theme";
 
@@ -22,21 +24,31 @@ export const Main: React.FC = () => (
     <Footage />
     {overlays.map((o, i) => {
       const Comp = COMPONENTS[o.kind];
-      const from = Math.round(o.a * FPS);
+      // plan times are in the author's-cut timeline; T() maps them onto the edited output
+      const from = Math.round(T(o.a) * FPS);
       return (
-        <Sequence key={i} from={from} durationInFrames={Math.round(o.b * FPS) - from} premountFor={FPS}>
+        <Sequence key={i} from={from} durationInFrames={Math.max(1, Math.round(T(o.b) * FPS) - from)} premountFor={FPS}>
           <Comp a={o.a} b={o.b} {...(o.props ?? {})} />
         </Sequence>
       );
     })}
+    {INSERTS.map((c, i) => (
+      <Sequence key={`c${i}`} from={Math.round(c.out * FPS)} durationInFrames={Math.round(c.dur * FPS)}>
+        <StepCard dur={c.dur} {...(c.props as { step: number; title: string })} />
+      </Sequence>
+    ))}
     <Subtitles />
     {overlays
       .filter((o) => o.sfx && o.sfx !== "none")
       .map((o, i) => (
-        <Sfx key={`s${i}`} t={o.sfx === "swell" ? o.a - 0.15 : o.a} kind={o.sfx as string} />
+        <Sfx key={`s${i}`} t={T(o.sfx === "swell" ? o.a - 0.15 : o.a)} kind={o.sfx as string} />
       ))}
     {extraSfx.map((s, i) => (
-      <Sfx key={`x${i}`} t={s.t} kind={s.kind} />
+      <Sfx key={`x${i}`} t={T(s.t)} kind={s.kind} />
     ))}
+    {INSERTS.flatMap((c, i) => [
+      <Sfx key={`cw${i}`} t={c.out} kind="whoosh" />,
+      <Sfx key={`cs${i}`} t={c.out + 0.05} kind="swell" />,
+    ])}
   </AbsoluteFill>
 );

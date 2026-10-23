@@ -29,6 +29,9 @@ def snap(t, before, after):
     return (lo + int(np.argmin(env[lo:hi]))) / 100
 
 # a cut may start a little early and end a little late, never inside the neighbouring words
+for ins in ops.get("inserts", []):
+    if not ins.get("nosnap"):
+        ins["at"] = snap(ins["at"], 30, 5)
 cuts = sorted(((c["a"], c["b"]) if c.get("nosnap") else (snap(c["a"], 12, 3), snap(c["b"], 3, 12)) for c in ops["cuts"]))
 
 # ---- pieces in edit time: footage ranges minus cuts, plus zero-length extras ----
@@ -48,6 +51,18 @@ for c in base:
     for s, e in segs:
         if e - s > 0.02:
             pieces.append({"e0": s, "e1": e, "raw": s + off, "dur": e - s, "kind": "footage"})
+# split footage at every point where something gets inserted
+points = [x_["at"] for x_ in ops.get("raw_extends", [])] + [i_["at"] for i_ in ops.get("inserts", [])]
+for at in points:
+    nxt = []
+    for p in pieces:
+        if p["e0"] < at < p["e1"]:
+            k = at - p["e0"]
+            nxt.append({**p, "e1": at, "dur": k})
+            nxt.append({**p, "e0": at, "raw": p["raw"] + k, "dur": p["dur"] - k})
+        else:
+            nxt.append(p)
+    pieces = nxt
 for x_ in ops.get("raw_extends", []):
     pieces.append({"e0": x_["at"], "e1": x_["at"], "raw": x_["raw_from"], "dur": x_["raw_to"] - x_["raw_from"], "kind": "footage", "order": 0})
 for ins in ops.get("inserts", []):

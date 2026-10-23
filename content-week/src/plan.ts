@@ -93,7 +93,6 @@ export const overlays: Overlay[] = [
   { a: 85.0, b: 92.5, kind: "LowerThird", sfx: "whoosh", props: { name: "Александра Рулёва", role: "маркетолог, продюсер · 5+ лет в онлайн-проектах" } },
 
   // STEP 1 — what to get out of one topic
-  { a: 112.7, b: 116.0, kind: "SectionTitle", sfx: "swell", props: { step: "Шаг 1", title: "Определяю, что хочу получить на выходе" } },
   {
     a: 116.5, b: 138.0, kind: "SideList", sfx: "none",
     props: {
@@ -123,7 +122,6 @@ export const overlays: Overlay[] = [
   },
 
   // STEP 2 — topic and structure
-  { a: 194.7, b: 197.9, kind: "SectionTitle", sfx: "swell", props: { step: "Шаг 2", title: "Выбираю тему и собираю структуру" } },
   { a: 198.0, b: 212.6, kind: "SideList", props: { title: "сначала определяю", numbered: true, items: [it(198.04, "Для кого ролик"), it(199.28, "Какую проблему решаю"), it(201.34, "Что зритель получит в конце")] } },
   {
     a: 213.6, b: 232.9, kind: "SideList",
@@ -137,7 +135,6 @@ export const overlays: Overlay[] = [
       footer: { t: 244.2, text: "финальный результат проверяю сама" },
     },
   },
-  { a: 254.4, b: 257.4, kind: "SectionTitle", sfx: "swell", props: { step: "Лайфхак", title: "Где искать тему для видео" } },
   // YouTube search screencast
   { a: 271.0, b: 279.4, kind: "NoteChip", sfx: "click", props: { text: "22 тыс. просмотров" } },
   { a: 280.6, b: 286.6, kind: "NoteChip", sfx: "click", props: { text: "41 тыс. подписчиков на канале" } },
@@ -163,16 +160,13 @@ export const overlays: Overlay[] = [
   { a: 503.7, b: 507.8, kind: "NoteChip", sfx: "click", props: { text: "Сравнение", color: "#8EA6FF" } },
 
   // STEP 3 — script
-  { a: 514.6, b: 517.9, kind: "SectionTitle", sfx: "swell", props: { step: "Шаг 3", title: "Сценарий с нейросетью" } },
   {
     a: 518.2, b: 534.6, kind: "WallPrompt",
     props: { title: "промпт для сценария", items: [it(520.22, "Помоги разработать сценарий моего видео"), it(526.8, "Моё видео будет отличаться тем, что…"), it(531.0, "…и дальше — о чём хотите рассказать")] },
   },
   { a: 549.5, b: 562.9, kind: "FiveLines", full: true, sfx: "whoosh", props: { barAt: 549.5, splitAt: 557.74, outAt: 560.2, label: "5 смысловых линий → 5 роликов" } },
   // STEP 4 — recording
-  { a: 563.3, b: 566.6, kind: "SectionTitle", sfx: "swell", props: { step: "Шаг 4", title: "Записываю длинное видео целиком" } },
   // STEP 5 — five shorts
-  { a: 577.8, b: 581.2, kind: "SectionTitle", sfx: "swell", props: { step: "Шаг 5", title: "Пять коротких роликов" } },
   {
     a: 586.8, b: 599.2, kind: "SideList",
     props: { title: "зритель Reels не видел длинное видео", check: true, items: [it(594.58, "Собственная логика"), it(595.72, "Зацепка"), it(596.32, "Одна конкретная мысль"), it(598.36, "Понятное завершение")] },
@@ -206,7 +200,6 @@ export const overlays: Overlay[] = [
 
   // STEP 6 — text formats
   { a: 757.9, b: 762.4, kind: "Kinetic", props: { size: 80, items: [it(758.4, "1 длинное видео"), it(760.3, "5 коротких роликов", { accent: true })] } },
-  { a: 762.6, b: 765.9, kind: "SectionTitle", sfx: "swell", props: { step: "Шаг 6", title: "Текстовые форматы" } },
   {
     a: 772.2, b: 820.6, kind: "SideList",
     props: {
@@ -230,8 +223,8 @@ export const overlays: Overlay[] = [
   { a: 1041.9, b: 1049.4, kind: "NoteChip", sfx: "click", props: { text: "Под коротким роликом — ссылка на длинное видео" } },
   { a: 1055.0, b: 1068.0, kind: "GrowPlatforms", props: { items: [{ t: 1057.4, id: "youtube" }, { t: 1059.6, id: "telegram" }, { t: 1061.6, id: "vk" }, { t: 1063.4, id: "dzen" }] } },
   {
-    a: 1068.6, b: 1091.6, kind: "TelegramCTA", sfx: "whoosh",
-    props: { title: "Полная пошаговая структура — в гайде", sub: "Скачайте и возвращайтесь к системе, когда будете повторять её для своей ниши", noteAt: 1084.24, note: "ссылка — в описании к видео" },
+    a: 1068.6, b: 1091.6, kind: "GuidePhone", sfx: "whoosh",
+    props: { swipeAt: 1076.6, noteAt: 1084.24 },
   },
   { a: 1092.0, b: 1101.8, kind: "CommentPrompt", sfx: "pop", props: { text: "Какой процесс создания контента отнимает у вас больше всего времени?" } },
 ];
@@ -246,4 +239,14 @@ export const extraSfx: { t: number; kind: "whoosh" | "click" | "pop" | "swell" }
   { t: 748.6, kind: "whoosh" },
   { t: 1022.6, kind: "whoosh" },
   { t: 1050.0, kind: "whoosh" },
+];
+
+/** Hand-drawn red ovals around the numbers the author reads off the screen (raw-pixel rects). */
+export const screenMarks: { a: number; b: number; rect: [number, number, number, number] }[] = [
+  { a: 271.0, b: 273.7, rect: [774, 263, 58, 26] }, // 22 тыс. просмотров
+  { a: 280.6, b: 283.8, rect: [536, 422, 162, 28] }, // 41,8 тыс. подписчиков
+  { a: 289.0, b: 291.6, rect: [776, 608, 58, 26] }, // 83 тыс. просмотров
+  { a: 293.0, b: 299.0, rect: [570, 422, 160, 28] }, // 39,6 тыс. подписчиков
+  { a: 303.0, b: 306.4, rect: [776, 514, 56, 26] }, // 86 тыс. просмотров
+  { a: 308.5, b: 311.2, rect: [580, 422, 160, 28] }, // 20,5 тыс. подписчиков
 ];
