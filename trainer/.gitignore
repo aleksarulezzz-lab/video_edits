@@ -1,4 +1,11 @@
 src_dl/
+kid_dl/
 transcript/audio16k.wav
 out/
-node_modules/
+node_modules
+public/media/
+public/fg/
+public/assets/
+models/
+assets/
+transcript/kid_*
