@@ -50,6 +50,9 @@ const MainClip: React.FC<{ c: Clip; n: number }> = ({ c, n }) => {
   );
 };
 
+// frames rendered by tools/trainer_matte.py for each depth word
+const FG_FRAMES: Record<string, number> = { trenazher: 75, magazin: 75, olimp: 68, chas: 70, besplatno: 68 };
+
 /** A word on the wall behind the author: footage, word, then her cut-out on top. */
 const DepthWord: React.FC<{ e: (typeof EV)[number]; t: number }> = ({ e, t }) => {
   const k = Math.max(0, Math.floor((t - e.a) * FPS + 1e-3));
@@ -64,7 +67,7 @@ const DepthWord: React.FC<{ e: (typeof EV)[number]; t: number }> = ({ e, t }) =>
         {word}
         <div style={{ height: 14, marginTop: 8, marginLeft: "auto", width: `${pIn * 100}%`, background: C.lime, borderRadius: 7 }} />
       </div>
-      <Img src={staticFile(`fg/${e.name}/${String(Math.min(k, 200)).padStart(4, "0")}.webp`)} style={{ position: "absolute", left: 0, top: 0, width: CROP.w * S, height: CROP.h * S }} />
+      <Img src={staticFile(`fg/${e.name}/${String(Math.min(k, FG_FRAMES[e.name as string] - 1)).padStart(4, "0")}.webp`)} style={{ position: "absolute", left: 0, top: 0, width: CROP.w * S, height: CROP.h * S }} />
     </>
   );
 };
