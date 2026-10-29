@@ -35,15 +35,24 @@ for n, ((a, b), (name, title)) in enumerate(zip(ranges, TITLES), 1):
     if nxt:
         b0 = min(b0, nxt[0] - 0.04)
     a0, b0 = round(a0 * FPS) / FPS, round(b0 * FPS) / FPS
-    rc = []
-    for c in clips:
-        lo, hi = max(a0, c["out"]), min(b0, c["out"] + c["dur"])
-        if hi - lo >= 1 / FPS - 1e-6:
-            rc.append({"src": c["src"], "in": round(c["in"] + lo - c["out"], 3), "dur": round(hi - lo, 3), "out": round(lo - a0, 3),
-                       "kid": c["kid"], "screen": c["screen"], "piece": len(rc)})
+    def cut(a0, b0):
+        rc = []
+        for c in clips:
+            lo, hi = max(a0, c["out"]), min(b0, c["out"] + c["dur"])
+            if hi - lo >= 1 / FPS - 1e-6:
+                rc.append({"src": c["src"], "in": round(c["in"] + lo - c["out"], 3), "dur": round(hi - lo, 3), "out": round(lo - a0, 3),
+                           "kid": c["kid"], "screen": c["screen"], "piece": len(rc)})
+        return rc
+    rc = cut(a0, b0)
+    # padding that spills a few frames into the neighbouring shot would flash: trim it
+    if len(rc) > 1 and rc[0]["dur"] < 0.3:
+        a0 = round((a0 + rc[0]["dur"]) * FPS) / FPS
+    if len(rc) > 1 and rc[-1]["dur"] < 0.3:
+        b0 = round((b0 - rc[-1]["dur"]) * FPS) / FPS
+    rc = cut(a0, b0)
     dur = round(b0 - a0, 3)
     # subtitles: phrase pages for a narrow frame, up to 2 lines
-    kept = [{**w, "s": round(w["s"] - a0, 3), "e": round(w["e"] - a0, 3)} for w in words if a0 - 0.01 <= w["s"] < b0 - 0.05]
+    kept = [{**w, "s": round(w["s"] - a0, 3), "e": round(w["e"] - a0, 3)} for w in words if w["e"] > a0 + 0.05 and w["s"] >= a0 - 0.3 and w["s"] < b0 - 0.05]
     if kept and kept[0]["w"][0].islower():
         kept[0]["w"] = kept[0]["w"][0].upper() + kept[0]["w"][1:]
     MAXL = 18
