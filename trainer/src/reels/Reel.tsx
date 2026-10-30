@@ -17,12 +17,14 @@ import r8 from "./data/reel_8.json";
  */
 type Word = { w: string; s: number; e: number; hl: boolean };
 type Page = { start: number; end: number; kid: boolean; lines: Word[][] };
-type Clip = { src: string; in: number; dur: number; out: number; kid: boolean; screen: boolean; piece: number };
+type Clip = { src: string; in: number; dur: number; out: number; kid: boolean; screen: boolean; piece: number; file?: string };
 type Ev = { kind: string; a: number; b: number; [k: string]: unknown };
 type ReelData = { n: number; name: string; title: string[]; duration: number; clips: Clip[]; captions: Page[]; events: Ev[] };
 export const REELS = [r1, r2, r3, r4, r5, r6, r7, r8] as unknown as ReelData[];
 export const END_CARD = 4.0;
 
+// a clip plays from its own cut-out file when the reel was prepared with tools/trainer_reel_media.py
+const clipSrc = (c: Clip) => staticFile(`media/${c.file ?? `${c.src}.mp4`}`);
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const ease = (t: number, a: number, d = 0.4, e = EASE.out) => interpolate(t, [a, a + d], [0, 1], { ...clamp, easing: e });
 const fadeOut = (t: number, b: number, d = 0.3) => interpolate(t, [b - d, b], [1, 0], clamp);
@@ -54,7 +56,7 @@ const MainClip: React.FC<{ d: ReelData; c: Clip; n: number }> = ({ d, c, n }) =>
   const f = useCurrentFrame();
   const t = c.out + f / FPS;
   const vol = (fr: number) => Math.min(1, (fr + 1) / 2, (n - fr) / 2);
-  const src = staticFile("media/main.mp4");
+  const src = clipSrc(c);
   const p = Math.max(0, ...d.events.filter((e) => BUBBLE_KINDS.includes(e.kind)).map((e) => overlayP(t, e.a, e.b)));
   const zoom = (framingIndex(d, t) % 2 ? 1.12 : 1.0) + 0.02 * Math.min(1, f / Math.max(1, n));
   const sc = 1 - (1 - PIP) * p;
@@ -94,7 +96,7 @@ const ScreenClip: React.FC<{ t: number; c: Clip; vol: (f: number) => number; d: 
     <AbsoluteFill style={{ background: `radial-gradient(70% 50% at 50% 50%, #1C2410 0%, ${C.ink} 75%)` }}>
       <div style={{ position: "absolute", left: 40, top: 480, width: Wd, height: Ht, borderRadius: 24, overflow: "hidden", opacity: p, transform: `scale(${(0.94 + 0.06 * p) * push})`,
         boxShadow: `0 0 0 2px rgba(200,255,0,${0.55 * pulse}), 0 0 60px rgba(200,255,0,${0.28 * pulse}), 0 30px 80px rgba(0,0,0,0.6)` }}>
-        <OffthreadVideo src={staticFile("media/main.mp4")} trimBefore={Math.round(c.in * FPS)} volume={vol}
+        <OffthreadVideo src={clipSrc(c)} trimBefore={Math.round(c.in * FPS)} volume={vol}
           style={{ position: "absolute", left: -PG.x * k, top: -PG.y * k, width: 1440 * k, height: 800 * k, maxWidth: "none" }} />
       </div>
     </AbsoluteFill>
@@ -106,7 +108,7 @@ const KidClip: React.FC<{ c: Clip; n: number }> = ({ c, n }) => {
   const vol = (fr: number) => Math.min(1, (fr + 1) / 2, (n - fr) / 2);
   return (
     <AbsoluteFill style={{ backgroundColor: C.ink }}>
-      <OffthreadVideo src={staticFile(`media/${c.src}.mp4`)} trimBefore={Math.round(c.in * FPS)} volume={vol} style={{ width: 1080, height: 1920 }} />
+      <OffthreadVideo src={clipSrc(c)} trimBefore={Math.round(c.in * FPS)} volume={vol} style={{ width: 1080, height: 1920 }} />
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 700, background: "linear-gradient(0deg, rgba(0,0,0,0.55), rgba(0,0,0,0))" }} />
     </AbsoluteFill>
   );
@@ -118,7 +120,7 @@ const Broll: React.FC<{ e: Ev }> = ({ e }) => {
   const p = interpolate(f, [0, 6], [0, 1], clamp) * interpolate(f, [(e.b - e.a) * FPS - 6, (e.b - e.a) * FPS], [1, 0], clamp);
   return (
     <AbsoluteFill style={{ opacity: p }}>
-      <OffthreadVideo src={staticFile(`media/${e.src}.mp4`)} trimBefore={Math.round((e.at as number) * FPS)} muted style={{ width: 1080, height: 1920, transform: `scale(${1.04 + 0.03 * (f / ((e.b - e.a) * FPS))})` }} />
+      <OffthreadVideo src={staticFile(`media/${(e.file as string) ?? `${e.src}.mp4`}`)} trimBefore={Math.round((e.at as number) * FPS)} muted style={{ width: 1080, height: 1920, transform: `scale(${1.04 + 0.03 * (f / ((e.b - e.a) * FPS))})` }} />
     </AbsoluteFill>
   );
 };
