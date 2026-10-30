@@ -44,6 +44,7 @@ SEGMENTS = {
         ("Уже сейчас у меня", "задач на тренажёре."), ("Именно это я и", "за сегодняшний день."), ("Таким образом, ребёнок не", "какие темы подтянуть.")],
 }
 
+RETEXT = {(5, "Будет: похвала и выбор — продолжить или закончить"): ("Будет: похвала в конце занятия", ["Будет:"])}
 # theses added for the short versions (text from the author's words)
 EXTRA = {2: [(2, "Олимпиадный режим: проверка только в конце", "И только в конце", 4.0, ["в", "конце"])]}
 
@@ -108,6 +109,9 @@ for n, ((ra, rb), (name, title)) in enumerate(zip(ranges, TITLES), 1):
     for tn, text, ph, d_, hl in EXTRA.get(n, []):
         t0 = to_reel(phrase(ph))
         ev.append({"kind": "thesis", "a": t0, "b": round(t0 + d_, 3), "text": text, "hl": hl})
+    for e in ev:  # theses whose wording relied on lines cut from the short version
+        if (n, e.get("text")) in RETEXT:
+            e["text"], e["hl"] = RETEXT[(n, e["text"])]
     ev.sort(key=lambda e: e["a"])
     kept = [{**w, "s": w["s"], "e": w["e"]} for w in kept]
     # subtitles: phrase pages for a narrow frame, up to 2 lines
