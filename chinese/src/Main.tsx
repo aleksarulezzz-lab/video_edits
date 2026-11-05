@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { C, EASE, FONT, FPS, W } from "./theme";
+import { C, EASE, FONT, FPS, ROUND, W } from "./theme";
 import edl from "./data/edl.json";
 import gfx from "./data/gfx.json";
 import { Graphics, Subtitles } from "./gfx";
@@ -42,19 +42,44 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
   );
 };
 
+/** The son repeating a word after the trainer (own footage, hands only): blurred backdrop, neon card, caption on the wall. */
+const PronClip: React.FC<{ c: Clip; n: number }> = ({ c, n }) => {
+  const f = useCurrentFrame();
+  const p = interpolate(f, [0, 9], [0, 1], { ...clamp, easing: EASE.out }) * interpolate(f, [n - 8, n], [1, 0], clamp);
+  const q = ease(f / FPS, 0.5, 0.5);
+  const tb = Math.round(c.in * FPS);
+  const vol = (fr: number) => 0.62 * Math.min(1, (fr + 1) / 4, (n - fr) / 4);
+  return (
+    <AbsoluteFill style={{ overflow: "hidden", backgroundColor: C.ink }}>
+      <AbsoluteFill style={{ background: `radial-gradient(ellipse at 75% 45%, ${C.accent} 0%, #23466B 55%, ${C.ink} 100%)` }} />
+      <div style={{ position: "absolute", left: 1090, top: 70, width: 528, height: 939, borderRadius: 30, overflow: "hidden", opacity: p,
+        transform: `translateY(${(1 - p) * 30}px)`, boxShadow: `0 0 0 3px ${C.neon}, 0 0 40px rgba(92,200,255,0.55), 0 30px 70px rgba(0,0,0,0.4)` }}>
+        <OffthreadVideo src={staticFile("media/pron.mp4")} trimBefore={tb} volume={vol} style={{ width: 528, height: 939 }} />
+      </div>
+      <div style={{ position: "absolute", left: 150, top: 300, width: 860, opacity: q, transform: `translateX(${(1 - q) * -40}px)` }}>
+        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 42, color: C.glass, letterSpacing: 1 }}>Тренажёр произносит — сын повторяет</div>
+        <div style={{ marginTop: 26, display: "flex", alignItems: "baseline", gap: 28, color: C.white }}>
+          <span style={{ fontFamily: "'WenQuanYi Zen Hei', sans-serif", fontSize: 180, lineHeight: 1, textShadow: `0 0 30px rgba(92,200,255,0.6)` }}>眼睛</span>
+          <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: 64, color: C.neon }}>yǎn jing</span>
+        </div>
+        <div style={{ marginTop: 22, fontFamily: FONT, fontWeight: 800, fontSize: 76, color: C.white }}>«глаза»</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
 /** A word across the whole frame behind the author: footage, word, then her cut-out on top. */
 const DepthWord: React.FC<{ e: Ev; t: number; src: number }> = ({ e, t, src }) => {
   const k = Math.max(0, Math.min(FG_FRAMES[e.name as string] - 1, Math.round((src - (e.src_a as number)) * FPS)));
   const word = e.word as string;
-  const size = Math.min(330, (W * 0.86) / (word.length * 0.66));
+  const size = Math.min(300, (W * 0.84) / (word.length * 0.7));
   const pIn = ease(t, e.a, 0.6);
   const pOut = interpolate(t, [e.b - 0.35, e.b], [1, 0], clamp);
   return (
     <>
-      <div style={{ position: "absolute", left: 0, right: 0, top: (word.includes(" ") ? 175 : 330) - size * 0.55, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: size, lineHeight: 1,
-        letterSpacing: -2, whiteSpace: "nowrap", opacity: pIn * pOut, transform: `translateY(${(1 - pIn) * 40}px) scale(${0.96 + 0.04 * pIn})`,
-        background: `linear-gradient(180deg, ${C.accent} 0%, ${C.blue} 100%)`, WebkitBackgroundClip: "text", color: "transparent",
-        filter: `drop-shadow(0 6px 18px rgba(28,46,68,0.18)) blur(${(1 - pIn) * 6}px)` }}>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 300 - size * 0.43, textAlign: "center", fontFamily: ROUND, fontWeight: 800, fontSize: size, lineHeight: 1,
+        letterSpacing: 2, whiteSpace: "nowrap", color: "#161616", opacity: 0.88 * pIn * pOut, transform: `translateY(${(1 - pIn) * 40}px) scale(${0.96 + 0.04 * pIn})`,
+        filter: `blur(${(1 - pIn) * 6}px)` }}>
         {word}
       </div>
       <Img src={staticFile(`fg/${e.name}/${String(k).padStart(4, "0")}.webp`)} style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080 }} />
@@ -136,6 +161,7 @@ const STING_AT = 6.2; // a gentle phrase of the track, seconds
 export const Main: React.FC = () => {
   const total = gfx.total;
   const chapters = EV.filter((e) => e.kind === "chapter");
+  const prons = EV.filter((e) => e.kind === "pron");
   let k = 0;
   return (
     <AbsoluteFill style={{ backgroundColor: "#fff" }}>
@@ -143,10 +169,10 @@ export const Main: React.FC = () => {
         const from = Math.round(c.out * FPS);
         const n = Math.round((c.out + c.dur) * FPS) - from;
         if (n <= 0) return null;
-        const idx = k++;
+        const idx = c.src === "main" ? k++ : k;
         return (
           <Sequence key={i} from={from} durationInFrames={n} premountFor={FPS}>
-            <MainClip c={c} idx={idx} n={n} />
+            {c.src === "pron" ? <PronClip c={c} n={n} /> : <MainClip c={c} idx={idx} n={n} />}
           </Sequence>
         );
       })}
@@ -166,7 +192,7 @@ export const Main: React.FC = () => {
       <Audio src={staticFile("music/mixkit-serene-view-443.mp3")} loop
         volume={(fr) => {
           const t = fr / FPS;
-          const sting = chapters.some((c) => t > c.a - 0.4 && t < c.a + 2.2) ? 0.3 : 1;
+          const sting = chapters.some((c) => t > c.a - 0.4 && t < c.a + 2.2) || prons.some((c) => t > c.a - 0.3 && t < c.b + 0.3) ? 0.3 : 1;
           const fade = Math.min(1, t / 2, (total - t) / 2);
           return BED_VOL * sting * Math.max(0, fade);
         }} />

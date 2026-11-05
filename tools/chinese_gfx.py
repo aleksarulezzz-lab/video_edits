@@ -9,7 +9,8 @@ import json, re, sys
 
 root = sys.argv[1]
 W = [{"w": w["word"].strip(), "s": w["start"], "e": w["end"]} for s in json.load(open(f"{root}/transcript/raw.json")) for w in s["words"]]
-clips = json.load(open(f"{root}/src/data/edl.json"))
+ALL = json.load(open(f"{root}/src/data/edl.json"))
+clips = [c for c in ALL if c["src"] == "main"]
 items = json.load(open(f"{root}/src/data/items.json"))
 norm = lambda x: re.sub(r"[^\wё]", "", x.lower().replace("ё", "е"))
 
@@ -108,7 +109,10 @@ thesis("Какой язык учит ваш ребёнок?", "Напишите 
 add("tier", find("а пока расскажу", 755), 4.1)
 
 ev.sort(key=lambda e: e["a"])
-total = clips[-1]["out"] + clips[-1]["dur"]
+for c in ALL:
+    if c["src"] == "pron":
+        ev.append({"kind": "pron", "a": c["out"], "b": round(c["out"] + c["dur"], 3)})
+total = ALL[-1]["out"] + ALL[-1]["dur"]
 json.dump({"total": total, "events": ev}, open(f"{root}/src/data/gfx.json", "w"), ensure_ascii=False, indent=0)
 for e in ev:
     print(f"{e['a']:7.2f}-{e['b']:7.2f} {e['kind']:8s} {e.get('text') or e.get('title') or e.get('word') or e.get('file') or e.get('focus') or ''}")

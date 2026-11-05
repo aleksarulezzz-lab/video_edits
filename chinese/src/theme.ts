@@ -3,13 +3,18 @@ import { Easing, staticFile } from "remotion";
 
 export const FONT = "Manrope";
 const weights = ["500", "600", "700", "800"] as const;
-export const fontsReady = Promise.all(
-  weights.flatMap((w) =>
+// rounded face for the words behind the author
+export const ROUND = "Nunito";
+export const fontsReady = Promise.all([
+  ...weights.flatMap((w) =>
     ["cyrillic", "latin"].map((subset) =>
       loadFont({ family: FONT, url: staticFile(`fonts/manrope-${subset}-${w}-normal.woff2`), weight: w }),
     ),
   ),
-);
+  ...(["700", "800"] as const).flatMap((w) =>
+    ["cyrillic", "latin"].map((subset) => loadFont({ family: ROUND, url: staticFile(`fonts/nunito-${subset}-${w}-normal.woff2`), weight: w })),
+  ),
+]);
 
 // soft blue palette under the author's blue sweater and the white wall
 export const C = { blue: "#9FD3F2", glass: "#DCEFFB", accent: "#3A8FD6", neon: "#5CC8FF", ink: "#1C2E44", white: "#FFFFFF" };

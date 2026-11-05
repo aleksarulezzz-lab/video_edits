@@ -17,8 +17,7 @@ fixes = json.load(open(f"{root}/plan/caption_fixes.json")) if __import__("os").p
 
 SRC = {
     "main": (f"{root}/transcript/audio16k.wav", f"{root}/transcript/raw.json"),
-    
-    
+    "pron": (f"{root}/transcript/pron16k.wav", f"{root}/transcript/pron.json"),  # the son repeating after the trainer
 }
 ENV, WORDS = {}, {}
 for k, (wav, js) in SRC.items():
@@ -58,7 +57,7 @@ for n, it in enumerate(spec):
     start = it.get("start_at", quietest(src, max(prev_e + 0.03, a - 0.25), a + 0.03))
     end = it.get("end_at", quietest(src, b - 0.03, min(next_s - 0.03, b + 0.3)))
     pieces, cur = [], start
-    for p0, p1 in pauses(src, start, end):
+    for p0, p1 in ([] if it.get("keep") else pauses(src, start, end)):
         if p0 - cur > 0.2 and end - p1 > 0.3:
             pieces.append((cur, p0 + 0.15))
             cur = p1 - 0.15

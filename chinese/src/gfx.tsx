@@ -129,7 +129,7 @@ const Tier: React.FC<{ e: Ev; t: number }> = ({ e, t }) => {
 
 /* ---------- graphics layer ---------- */
 const covers = (t: number) =>
-  EV.some((e) => (e.kind === "broll" && e.mode === "full" && on(e, t, 0)) || (e.kind === "screen" && e.mode === "full" && on(e, t, 0)) || (e.kind === "tier" && on(e, t, 0)));
+  EV.some((e) => (e.kind === "broll" && e.mode === "full" && on(e, t, 0)) || (e.kind === "screen" && e.mode === "full" && on(e, t, 0)) || (e.kind === "tier" && on(e, t, 0)) || (e.kind === "pron" && on(e, t, 0)));
 const wallBusy = (t: number) => EV.some((e) => ((e.kind === "screen" && e.mode === "window") || (e.kind === "broll" && e.mode === "card")) && on(e, t, 0.2));
 
 export const Graphics: React.FC = () => {

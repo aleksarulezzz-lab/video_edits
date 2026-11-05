@@ -78,6 +78,22 @@
   "block": 4,
   "src": "main",
   "a": 243.2,
+  "b": 262.28
+ },
+ {
+  "block": 4,
+  "src": "pron",
+  "a": 0.0,
+  "b": 7.2,
+  "start_at": 0.0,
+  "end_at": 7.2,
+  "keep": true,
+  "kid": true
+ },
+ {
+  "block": 4,
+  "src": "main",
+  "a": 262.84,
   "b": 278.7
  },
  {
