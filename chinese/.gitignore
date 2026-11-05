@@ -1,0 +1,7 @@
+src_dl/
+transcript/audio16k.wav
+out/
+node_modules
+public/media/
+public/fg/
+models/
