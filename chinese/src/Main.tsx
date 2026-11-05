@@ -89,7 +89,7 @@ const DepthWord: React.FC<{ e: Ev; t: number; src: number }> = ({ e, t, src }) =
 
 /* ---------- screencast pieces ---------- */
 // regions of the 1598×1362 screen recording to show for each kind of screen
-const FOCUS: Record<string, { x: number; y: number; w: number; h: number }> = {
+export const FOCUS: Record<string, { x: number; y: number; w: number; h: number }> = {
   write: { x: 330, y: 380, w: 940, h: 900 },
   cards: { x: 40, y: 220, w: 1500, h: 1000 },
   listen: { x: 40, y: 250, w: 1500, h: 900 },
@@ -98,7 +98,7 @@ const FOCUS: Record<string, { x: number; y: number; w: number; h: number }> = {
   shophero: { x: 40, y: 30, w: 1520, h: 1000 },
   hero: { x: 40, y: 0, w: 1520, h: 1330 },
 };
-const LABEL: Record<string, string> = { write: "Цифровая пропись", cards: "Карточки", listen: "Послушай и выбери", plan: "План дня", shop: "Магазин", shophero: "Магазин", hero: "Герой" };
+export const LABEL: Record<string, string> = { write: "Цифровая пропись", cards: "Карточки", listen: "Послушай и выбери", plan: "План дня", shop: "Магазин", shophero: "Магазин", hero: "Герой" };
 
 const Screen: React.FC<{ e: Ev }> = ({ e }) => {
   const f = useCurrentFrame();
