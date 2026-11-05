@@ -51,7 +51,7 @@ const DepthWord: React.FC<{ e: Ev; t: number; src: number }> = ({ e, t, src }) =
   const pOut = interpolate(t, [e.b - 0.35, e.b], [1, 0], clamp);
   return (
     <>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 330 - size * 0.55, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: size, lineHeight: 1,
+      <div style={{ position: "absolute", left: 0, right: 0, top: (word.includes(" ") ? 175 : 330) - size * 0.55, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: size, lineHeight: 1,
         letterSpacing: -2, whiteSpace: "nowrap", opacity: pIn * pOut, transform: `translateY(${(1 - pIn) * 40}px) scale(${0.96 + 0.04 * pIn})`,
         background: `linear-gradient(180deg, ${C.accent} 0%, ${C.blue} 100%)`, WebkitBackgroundClip: "text", color: "transparent",
         filter: `drop-shadow(0 6px 18px rgba(28,46,68,0.18)) blur(${(1 - pIn) * 6}px)` }}>
@@ -68,7 +68,7 @@ const FOCUS: Record<string, { x: number; y: number; w: number; h: number }> = {
   write: { x: 330, y: 380, w: 940, h: 900 },
   cards: { x: 40, y: 220, w: 1500, h: 1000 },
   listen: { x: 40, y: 250, w: 1500, h: 900 },
-  plan: { x: 20, y: 280, w: 1560, h: 520 },
+  plan: { x: 20, y: 290, w: 1180, h: 400 },
   shop: { x: 0, y: 0, w: 1598, h: 1362 },
   shophero: { x: 40, y: 30, w: 1520, h: 1000 },
   hero: { x: 40, y: 0, w: 1520, h: 1330 },
@@ -82,7 +82,7 @@ const Screen: React.FC<{ e: Ev }> = ({ e }) => {
   const R = FOCUS[e.focus as string];
   const p = ease(t, e.a, 0.45) * interpolate(t, [e.b - 0.35, e.b], [1, 0], clamp);
   const pulse = 0.65 + 0.25 * Math.sin(f / 9);
-  const boxW = full ? Math.min(1500, (940 * R.w) / R.h) : 660;
+  const boxW = full ? Math.min(1500, (940 * R.w) / R.h) : e.focus === "plan" ? 740 : 660;
   const boxH = full ? Math.min(940, (1500 * R.h) / R.w) : (660 * R.h) / R.w;
   const k = Math.min(boxW / R.w, boxH / R.h) * interpolate(f, [0, (e.b - e.a) * FPS], [1, 1.06], clamp);
   const left = full ? (W - boxW) / 2 : 70, top = full ? (1080 - boxH) / 2 - 10 : Math.max(120, 430 - boxH / 2);

@@ -51,13 +51,13 @@ for name, word, a, b in DEPTH:
 SCREEN = [
     ("помешало мне сделать", 0, 3.4, 13.5, "window", "write"),        # hook: a character being drawn, in the first 15 s
     ("Сначала иероглиф появляется", 160, 15.0, 8.0, "full", "write"),
-    ("А ещё есть карточки", 226, 6.6, 72.0, "full", "cards"),
+    ("А ещё есть карточки", 226, 4.6, 74.0, "full", "cards"),
     ("Поэтому тренажер сначала сам", 255, 5.0, 60.0, "window", "listen"),
     ("у него есть план дня", 318, 4.6, 52.6, "window", "plan"),
-    ("Ему наоборот очень нравится", 995, 4.4, 105.6, "window", "shophero"),
+    ("Ему наоборот очень нравится", 995, 4.4, 102.0, "window", "shop"),
     ("магазин, когда он может", 390, 5.0, 100.4, "full", "shop"),
     ("нравится увидеть план", 406, 4.6, 110.4, "window", "plan"),
-    ("скромный на вид", 776, 3.0, 49.6, "window", "hero"),
+    ("скромный на вид", 776, 2.3, 50.0, "window", "hero"),
 ]
 for ph, after, dur, s0, mode, focus in SCREEN:
     add("screen", find(ph, after), dur, at=s0, mode=mode, focus=focus)

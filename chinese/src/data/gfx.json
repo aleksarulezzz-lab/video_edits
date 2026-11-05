@@ -147,8 +147,8 @@
 {
 "kind": "screen",
 "a": 121.717,
-"b": 128.317,
-"at": 72.0,
+"b": 126.317,
+"at": 74.0,
 "mode": "full",
 "focus": "cards"
 },
@@ -263,9 +263,9 @@
 "kind": "screen",
 "a": 227.163,
 "b": 231.563,
-"at": 105.6,
+"at": 102.0,
 "mode": "window",
-"focus": "shophero"
+"focus": "shop"
 },
 {
 "kind": "thesis",
@@ -406,8 +406,8 @@
 {
 "kind": "screen",
 "a": 421.63,
-"b": 424.63,
-"at": 49.6,
+"b": 423.93,
+"at": 50.0,
 "mode": "window",
 "focus": "hero"
 },
