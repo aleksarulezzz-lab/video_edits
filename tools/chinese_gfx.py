@@ -57,7 +57,6 @@ SCREEN = [
     ("у него есть план дня", 318, 4.6, 52.6, "window", "plan"),
     ("Ему наоборот очень нравится", 995, 4.4, 102.0, "window", "shop"),
     ("магазин, когда он может", 390, 5.0, 100.4, "full", "shop"),
-    ("нравится увидеть план", 406, 4.6, 110.4, "window", "plan"),
     ("скромный на вид", 776, 2.3, 50.0, "window", "hero"),
 ]
 for ph, after, dur, s0, mode, focus in SCREEN:
@@ -71,6 +70,7 @@ BROLL = [
     ("именно лексику, связанную с едой", 730, 3.0, "broll/dumplings.mp4", 0.5, "full"),
     ("что хочу учить", 69, 2.6, "media/son_IMG_6021.mp4", 3.0, "card"),
     ("Вспомнит, садится", 687, 3.4, "media/son_IMG_6024.mp4", 1.0, "card"),
+    ("нравится увидеть план", 406, 4.6, "media/plan_done.jpg", 0.0, "photo"),  # IMG_6026, crop below the greeting (no name)
 ]
 for ph, after, dur, f, at, mode in BROLL:
     add("broll", find(ph, after), dur, file=f, at=at, mode=mode)

@@ -139,6 +139,19 @@ const Broll: React.FC<{ e: Ev }> = ({ e }) => {
   const n = (e.b - e.a) * FPS;
   const p = interpolate(f, [0, 8], [0, 1], clamp) * interpolate(f, [n - 8, n], [1, 0], clamp);
   const src = staticFile(e.file as string);
+  if (e.mode === "photo") {
+    // a still from the son's phone video: today's plan on the trainer, framed like the screencast windows
+    return (
+      <div style={{ position: "absolute", left: 90, top: 170, width: 700, opacity: p, transform: `translateY(${(1 - p) * 30}px)` }}>
+        <div style={{ width: 700, height: 570, borderRadius: 26, overflow: "hidden",
+          boxShadow: "0 0 0 2px rgba(92,200,255,0.9), 0 0 34px rgba(92,200,255,0.45), 0 24px 60px rgba(28,46,68,0.35)" }}>
+          <Img src={src} style={{ width: 700, height: 570, objectFit: "cover", transform: `scale(${1.0 + 0.05 * (f / n)})`, transformOrigin: "50% 60%" }} />
+        </div>
+        <div style={{ marginTop: 16, display: "inline-block", padding: "8px 18px", borderRadius: 14, background: "rgba(28,46,68,0.85)", color: C.white,
+          fontFamily: FONT, fontWeight: 800, fontSize: 26 }}>План дня</div>
+      </div>
+    );
+  }
   if (e.mode === "card") {
     return (
       <div style={{ position: "absolute", left: 200, top: 110, width: 430, height: 764, borderRadius: 28, overflow: "hidden", opacity: p,
@@ -155,13 +168,10 @@ const Broll: React.FC<{ e: Ev }> = ({ e }) => {
 };
 
 /* ---------- music: a quiet bed under the voice, short phrases of «A Decade in Beijing» on chapter cards ---------- */
-const BED_VOL = 0.028; // ~21 dB under the voice
 const STING_AT = 6.2; // a gentle phrase of the track, seconds
 
 export const Main: React.FC = () => {
-  const total = gfx.total;
   const chapters = EV.filter((e) => e.kind === "chapter");
-  const prons = EV.filter((e) => e.kind === "pron");
   let k = 0;
   return (
     <AbsoluteFill style={{ backgroundColor: "#fff" }}>
@@ -188,14 +198,6 @@ export const Main: React.FC = () => {
       ))}
       <Graphics />
       <Subtitles />
-      {/* the bed fades out under the chapter stings and dips a little under screencasts with speech */}
-      <Audio src={staticFile("music/mixkit-serene-view-443.mp3")} loop
-        volume={(fr) => {
-          const t = fr / FPS;
-          const sting = chapters.some((c) => t > c.a - 0.4 && t < c.a + 2.2) || prons.some((c) => t > c.a - 0.3 && t < c.b + 0.3) ? 0.3 : 1;
-          const fade = Math.min(1, t / 2, (total - t) / 2);
-          return BED_VOL * sting * Math.max(0, fade);
-        }} />
       {chapters.map((c, i) => (
         <Sequence key={`m${i}`} from={Math.max(0, Math.round((c.a - 0.3) * FPS))} durationInFrames={Math.round(2.4 * FPS)}>
           <Audio src={staticFile("music/mixkit-a-decade-in-beijing-863.mp3")} trimBefore={Math.round((STING_AT + i * 4.0) * FPS)}
@@ -203,7 +205,7 @@ export const Main: React.FC = () => {
         </Sequence>
       ))}
       {EV.map((e, i) => {
-        const s = e.kind === "chapter" ? ["whoosh", 0.1] : e.kind === "depth" ? ["swell", 0.07] : e.kind === "tier" ? ["whoosh", 0.1] : null;
+        const s = e.kind === "chapter" ? ["whoosh", 0.1] : e.kind === "depth" && e.a > 2 ? ["swell", 0.07] : e.kind === "tier" ? ["whoosh", 0.1] : null;
         if (!s) return null;
         return (
           <Sequence key={`x${i}`} from={Math.max(0, Math.round((e.a - (e.kind === "chapter" ? 0.3 : 0)) * FPS))} durationInFrames={Math.round(1.4 * FPS)}>
