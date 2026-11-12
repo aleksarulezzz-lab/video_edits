@@ -20,6 +20,7 @@ SRC = {
     "dg": (f"{root}/transcript/dosyem_glaza.wav", f"{root}/transcript/dosyem_glaza.json"),      # re-shoot: eyes and taste
     "dp": (f"{root}/transcript/dosyem_podpiska.wav", f"{root}/transcript/dosyem_podpiska.json"),  # re-shoot: summary, subscription
     "rh": (f"{root}/transcript/ready_horizontal.wav", f"{root}/transcript/ready_horizontal.json"),  # the finished ad (intro)
+    "el": (f"{root}/transcript/elevenlabs_voice.wav", f"{root}/transcript/elevenlabs_voice.json"),  # the generated voice, played alone
 }
 ENV, WORDS = {}, {}
 for k, (wav, js) in SRC.items():

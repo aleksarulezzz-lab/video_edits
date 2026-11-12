@@ -9,3 +9,7 @@ ad/transcript/*.wav
 ad/transcript/log.txt
 ad/plan/*.jpg
 ad/out/
+ad/public/media/
+ad/public/sc/
+ad/public/broll/
+ad/public/fg/
