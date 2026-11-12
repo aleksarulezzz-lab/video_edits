@@ -1,0 +1,637 @@
+{
+"total": 524.9666666666667,
+"events": [
+{
+"kind": "side",
+"a": 10.643,
+"b": 13.743,
+"text": "Этот ролик сделала нейросеть",
+"side": "L",
+"icon": null,
+"big": false
+},
+{
+"kind": "depth",
+"a": 13.12,
+"b": 16.32,
+"name": "bez",
+"word": "БЕЗ ДИЗАЙНЕРА",
+"src": "main",
+"src_a": 144.9
+},
+{
+"kind": "side",
+"a": 14.82,
+"b": 18.32,
+"text": "Ни одной программы для моушна",
+"side": "R",
+"icon": null,
+"big": false
+},
+{
+"kind": "clip",
+"a": 25.353,
+"b": 27.553,
+"file": "media/rh.mp4",
+"at": 64.4,
+"mode": "full",
+"label": "Первая версия: «ваш город» в океане"
+},
+{
+"kind": "side",
+"a": 28.64,
+"b": 31.74,
+"text": "Сколько платят на фрилансе?",
+"side": "R",
+"icon": "money",
+"big": false
+},
+{
+"kind": "broll",
+"a": 39.0,
+"b": 41.6,
+"file": "broll/drinking-coffee-and-typing-on-a-laptop.mp4",
+"at": 1.0
+},
+{
+"kind": "side",
+"a": 40.84,
+"b": 43.54,
+"text": "Нейроагент ищет клиентов",
+"side": "L",
+"icon": null,
+"big": false
+},
+{
+"kind": "broll",
+"a": 45.083,
+"b": 47.683,
+"file": "broll/coworkers-talk-on-a-video-conference.mp4",
+"at": 2.0
+},
+{
+"kind": "insert",
+"a": 53.083,
+"b": 61.083,
+"name": "questions"
+},
+{
+"kind": "side",
+"a": 71.817,
+"b": 74.917,
+"text": "Ролик ответит за меня",
+"side": "R",
+"icon": null,
+"big": false
+},
+{
+"kind": "stinger",
+"a": 77.223,
+"b": 78.523,
+"title": "Стиль"
+},
+{
+"kind": "screen",
+"a": 78.573,
+"b": 88.003,
+"file": "sc/sc_pinterest.mp4",
+"at": 4.0,
+"speed": 1.6,
+"crop": [
+0,
+140,
+1920,
+840
+],
+"label": "Pinterest: поиск референса",
+"logo": "pinterest"
+},
+{
+"kind": "side",
+"a": 88.823,
+"b": 92.023,
+"text": "Бумажный коллаж",
+"side": "L",
+"icon": null,
+"big": false
+},
+{
+"kind": "side",
+"a": 97.777,
+"b": 101.277,
+"text": "Беру только стиль, тексты свои",
+"side": "R",
+"icon": null,
+"big": false
+},
+{
+"kind": "screen",
+"a": 103.103,
+"b": 106.103,
+"file": "sc/sc_pinterest.mp4",
+"at": 40.0,
+"speed": 1.0,
+"crop": [
+1035,
+90,
+885,
+790
+],
+"label": "Save As Bot: вставляю ссылку",
+"logo": "telegram"
+},
+{
+"kind": "screen",
+"a": 106.103,
+"b": 109.303,
+"file": "sc/sc_pinterest.mp4",
+"at": 68.6,
+"speed": 1.0,
+"crop": [
+1035,
+90,
+885,
+790
+],
+"label": "Save As Bot: сохраняю видео",
+"logo": "telegram"
+},
+{
+"kind": "stinger",
+"a": 108.917,
+"b": 110.217,
+"title": "Сценарий"
+},
+{
+"kind": "insert",
+"a": 111.377,
+"b": 115.577,
+"name": "voice"
+},
+{
+"kind": "screen",
+"a": 124.863,
+"b": 133.03,
+"file": "sc/sc_claude_first.mp4",
+"at": 12.0,
+"speed": 1.0,
+"crop": [
+440,
+175,
+1000,
+815
+],
+"label": "Claude: сначала текст",
+"logo": "claude"
+},
+{
+"kind": "depth",
+"a": 133.35,
+"b": 136.55,
+"name": "snachala",
+"word": "СНАЧАЛА ТЕКСТ",
+"src": "main",
+"src_a": 434.6
+},
+{
+"kind": "insert",
+"a": 137.653,
+"b": 142.253,
+"name": "textvideo"
+},
+{
+"kind": "screen",
+"a": 141.937,
+"b": 157.123,
+"file": "sc/sc_claude_first.mp4",
+"at": 18.0,
+"speed": 0.8,
+"crop": [
+440,
+175,
+1000,
+815
+],
+"label": "Claude: правка про «2–3% лимита»",
+"logo": "claude",
+"zoom": [
+0.35,
+[
+470,
+230,
+900,
+300
+]
+]
+},
+{
+"kind": "clip",
+"a": 160.527,
+"b": 164.727,
+"file": "media/rh.mp4",
+"at": 5.0,
+"mode": "window",
+"label": "×2,4 за 3 года (из ролика)"
+},
+{
+"kind": "side",
+"a": 165.567,
+"b": 168.167,
+"text": "Источник: исследование рынка",
+"side": "L",
+"icon": null,
+"big": false
+},
+{
+"kind": "depth",
+"a": 174.96,
+"b": 178.16,
+"name": "golos",
+"word": "ЖИВОЙ ГОЛОС",
+"src": "main",
+"src_a": 549.8
+},
+{
+"kind": "logo",
+"a": 176.54,
+"b": 178.94,
+"logo": "elevenlabs",
+"side": "R",
+"label": "ElevenLabs"
+},
+{
+"kind": "stinger",
+"a": 178.233,
+"b": 179.533,
+"title": "Лайфхак",
+"variant": "yellow"
+},
+{
+"kind": "screen",
+"a": 179.223,
+"b": 194.703,
+"file": "sc/sc_elevenlabs.mp4",
+"at": 60.0,
+"speed": 1.0,
+"crop": [
+300,
+120,
+1320,
+820
+],
+"label": "ElevenLabs: текст для озвучки",
+"logo": "elevenlabs"
+},
+{
+"kind": "side",
+"a": 182.123,
+"b": 185.223,
+"text": "Числа словами, «Клод» по-русски",
+"side": "R",
+"icon": null,
+"big": false
+},
+{
+"kind": "broll",
+"a": 194.703,
+"b": 197.267,
+"file": "broll/woman-putting-on-headphones.mp4",
+"at": 3.0
+},
+{
+"kind": "listen",
+"a": 197.267,
+"b": 204.0,
+"voice": "Nataly Vershinina · Calm & Friendly"
+},
+{
+"kind": "stinger",
+"a": 203.93,
+"b": 205.23,
+"title": "Анимация"
+},
+{
+"kind": "screen",
+"a": 209.047,
+"b": 213.047,
+"file": "sc/sc_claude_upload.mp4",
+"at": 2.0,
+"speed": 1.0,
+"crop": [
+440,
+175,
+1000,
+815
+],
+"label": "Claude: озвучка, фото, скрин",
+"logo": "claude"
+},
+{
+"kind": "broll",
+"a": 217.947,
+"b": 220.147,
+"file": "broll/coding-on-a-laptop.mp4",
+"at": 2.0
+},
+{
+"kind": "insert",
+"a": 221.207,
+"b": 226.607,
+"name": "codefilm"
+},
+{
+"kind": "side",
+"a": 231.167,
+"b": 234.267,
+"text": "Русский текст без ошибок",
+"side": "L",
+"icon": null,
+"big": false
+},
+{
+"kind": "clip",
+"a": 236.263,
+"b": 239.863,
+"file": "media/rh.mp4",
+"at": 54.2,
+"mode": "window",
+"label": "Вырезанное фото с обводкой"
+},
+{
+"kind": "side",
+"a": 243.98,
+"b": 247.08,
+"text": "Название и ссылку замазала",
+"side": "R",
+"icon": null,
+"big": false
+},
+{
+"kind": "stinger",
+"a": 250.517,
+"b": 251.817,
+"title": "Ошибки"
+},
+{
+"kind": "clip",
+"a": 255.27,
+"b": 257.67,
+"file": "media/rh.mp4",
+"at": 64.6,
+"mode": "window",
+"label": "Ошибка 1: город в океане",
+"mark": "circle"
+},
+{
+"kind": "insert",
+"a": 257.67,
+"b": 261.67,
+"name": "pin"
+},
+{
+"kind": "clip",
+"a": 263.0,
+"b": 267.4,
+"file": "media/rh.mp4",
+"at": 79.6,
+"mode": "window",
+"label": "Ошибка 2: надписи по старому тексту",
+"mark": "strike"
+},
+{
+"kind": "endcard",
+"a": 280.963,
+"b": 287.323
+},
+{
+"kind": "clip",
+"a": 287.323,
+"b": 290.923,
+"file": "media/rv.mp4",
+"at": 91.0,
+"mode": "phone",
+"label": "Исправлено: ссылка на канал"
+},
+{
+"kind": "depth",
+"a": 299.933,
+"b": 303.133,
+"name": "glaza",
+"word": "ГЛАЗА И ВКУС ТВОИ",
+"src": "dg",
+"src_a": 73.6
+},
+{
+"kind": "side",
+"a": 302.167,
+"b": 304.867,
+"text": "Отсмотреть каждый кадр",
+"side": "R",
+"icon": null,
+"big": false
+},
+{
+"kind": "broll",
+"a": 312.383,
+"b": 315.183,
+"file": "broll/a-finger-scrolling-through-a-smartphone.mp4",
+"at": 2.0
+},
+{
+"kind": "logo",
+"a": 330.177,
+"b": 332.777,
+"logo": "claudecode",
+"side": "R",
+"label": "Claude Code"
+},
+{
+"kind": "screen",
+"a": 331.577,
+"b": 335.577,
+"file": "sc/sc_claudecode_vertical.mp4",
+"at": 4.0,
+"speed": 1.5,
+"crop": [
+300,
+70,
+1320,
+900
+],
+"label": "Claude Code: наработки",
+"logo": "claudecode"
+},
+{
+"kind": "side",
+"a": 335.627,
+"b": 339.027,
+"text": "«Тот же ролик, только вертикальный»",
+"side": "L",
+"icon": null,
+"big": false
+},
+{
+"kind": "screen",
+"a": 338.743,
+"b": 342.343,
+"file": "sc/sc_claudecode_vertical.mp4",
+"at": 18.0,
+"speed": 1.0,
+"crop": [
+300,
+70,
+1320,
+900
+],
+"label": "Claude Code: одна фраза",
+"logo": "claudecode"
+},
+{
+"kind": "clip",
+"a": 345.033,
+"b": 353.003,
+"file": "media/rh.mp4",
+"at": 20.0,
+"mode": "pair",
+"file2": "media/rv.mp4",
+"at2": 20.0,
+"label": "YouTube + Reels"
+},
+{
+"kind": "tier",
+"a": 353.003,
+"b": 375.417,
+"title": "Что понадобилось",
+"items": [
+{
+"text": "Pinterest: стиль",
+"at": 353.503,
+"icon": "pinterest"
+},
+{
+"text": "Claude: сценарий и анимация",
+"at": 356.003,
+"icon": "claude"
+},
+{
+"text": "ElevenLabs: голос",
+"at": 359.103,
+"icon": "elevenlabs"
+},
+{
+"text": "Claude Code: вертикальная версия",
+"at": 361.603,
+"icon": "claudecode"
+},
+{
+"text": "Время: ~1 час, из них 20 мин моих",
+"at": 364.703,
+"icon": "clock"
+}
+]
+},
+{
+"kind": "side",
+"a": 380.767,
+"b": 383.867,
+"text": "Вопросы клиентов = сценарий",
+"side": "L",
+"icon": null,
+"big": true
+},
+{
+"kind": "broll",
+"a": 397.66,
+"b": 400.26,
+"file": "broll/a-girl-presses-record-on-a-camera-and-begins-a-vlog.mp4",
+"at": 1.0
+},
+{
+"kind": "insert",
+"a": 400.32,
+"b": 406.82,
+"name": "split"
+},
+{
+"kind": "depth",
+"a": 424.523,
+"b": 427.723,
+"name": "zamysel",
+"word": "ЗАМЫСЕЛ + ГОЛОС",
+"src": "main",
+"src_a": 974.6
+},
+{
+"kind": "stinger",
+"a": 428.783,
+"b": 430.083,
+"title": "Деньги"
+},
+{
+"kind": "broll",
+"a": 436.7,
+"b": 439.3,
+"file": "broll/a-young-man-opens-his-laptop-in-a-cafe.mp4",
+"at": 1.0
+},
+{
+"kind": "tier",
+"a": 439.993,
+"b": 460.193,
+"title": "Сколько платят",
+"items": [
+{
+"text": "Рекламный анимационный ролик, 20–25 сек",
+"at": 440.293,
+"icon": "fl",
+"shot": 16.5
+},
+{
+"text": "Моушн-дизайнер для рекламы и ИИ-креативов",
+"at": 443.793,
+"icon": "fl",
+"shot": 8.5
+},
+{
+"text": "Постоянный человек на анимации в Claude",
+"at": 447.293,
+"icon": "fl",
+"shot": 26.5
+},
+{
+"text": "Медиана 5 000 ₽, четверть заказов от 9 000 ₽",
+"at": 451.193,
+"icon": "flaks",
+"shot": 0
+}
+],
+"shots": "sc/sc_freelance.mp4"
+},
+{
+"kind": "depth",
+"a": 475.097,
+"b": 478.297,
+"name": "ot3000",
+"word": "ОТ 3 000 ₽",
+"src": "main",
+"src_a": 1078.8
+},
+{
+"kind": "insert",
+"a": 478.297,
+"b": 482.697,
+"name": "price"
+},
+{
+"kind": "guide",
+"a": 482.953,
+"b": 489.953
+},
+{
+"kind": "plate",
+"a": 507.18,
+"b": 512.18,
+"text": "t.me/zapuskator_A"
+}
+]
+}

@@ -3,7 +3,10 @@ content-week/public/media/
 content-week/out/
 chinese/transcript/pron16k.wav
 chinese/public/assets/
-ad/src/
+ad/src/*.mkv
+ad/src/*.mp4
+ad/src/*.mp3
+ad/src/broll/
 ad/qc/
 ad/transcript/*.wav
 ad/transcript/log.txt
@@ -13,3 +16,4 @@ ad/public/media/
 ad/public/sc/
 ad/public/broll/
 ad/public/fg/
+ad/node_modules
