@@ -106,12 +106,12 @@ const DepthCut: React.FC<{ e: Ev; srcT: number }> = ({ e, srcT }) => {
 /** a number is not readable when the author covers it: it stands on the free wall in front of the footage */
 const WallNumber: React.FC<{ t: number; e: Ev }> = ({ t, e }) => {
   const p = ease(t, e.a, 0.45, EASE.spring) * fade(t, e.b, 0.45);
-  const [small, big] = (e.word as string).split("|");
+  const [small, ...big] = (e.word as string).split("|");
   return (
     <div style={{ position: "absolute", left: 60, top: 110, opacity: p, transform: `translateX(${(1 - p) * -60}px)`, ...glass(), padding: "22px 40px 30px",
       fontFamily: ROUND, fontWeight: 800, color: "#161616", lineHeight: 0.95 }}>
-      <div style={{ fontSize: 80 }}>{small}</div>
-      <div style={{ fontSize: 130, letterSpacing: 1, whiteSpace: "nowrap" }}>{big}</div>
+      <div style={{ fontSize: 56, marginBottom: 6 }}>{small}</div>
+      {big.map((l, i) => <div key={i} style={{ fontSize: 118, letterSpacing: 1, whiteSpace: "nowrap" }}>{l}</div>)}
     </div>
   );
 };

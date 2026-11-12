@@ -237,8 +237,8 @@ const Price: React.FC<{ e: Ev }> = ({ e }) => (
             </div>
           );
         })}
-        <div style={{ position: "absolute", left: 620, top: 360, transform: `rotate(${Math.sin(step(f) * 0.6) * 4 * (1 - lin(s, 1.4, 1.6))}deg) scale(${pop(s, 0.9, 0.5)})`, transformOrigin: "50% -100px" }}>
-          <Strip text="3 000 ₽ и выше" bg={C.yellow} size={120} seed={161} rot={-3} />
+        <div style={{ position: "absolute", left: 520, top: 360, transform: `rotate(${Math.sin(step(f) * 0.6) * 4 * (1 - lin(s, 1.4, 1.6))}deg) scale(${pop(s, 0.9, 0.5)})`, transformOrigin: "50% -100px" }}>
+          <Strip text="3 000 – 5 000 ₽" bg={C.yellow} size={112} seed={161} rot={-3} />
         </div>
         <div style={{ position: "absolute", left: 700, top: 640, opacity: pop(s, 2.0) }}><Strip text="за один ролик" bg={C.navy} fg={C.cream} size={54} seed={162} rot={2} /></div>
       </>

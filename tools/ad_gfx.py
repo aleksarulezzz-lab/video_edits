@@ -67,7 +67,7 @@ for name, word, src, ph, after, m0 in [("bez", "Без дизайнера", "mai
 
 # the price stands on the free wall in front of the author (a number behind her is not readable)
 a = at("main", "стоит от 3000", 1075)
-add("wallnum", a, a + 3.6, word="ОТ|3 000 ₽")
+add("wallnum", a, a + 3.6, word="за ролик|3 000 –|5 000 ₽")
 
 # ---- block 1: the finished ad, then the hook ----
 side("Этот ролик сделала нейросеть", "main", "Вот этот ролик", 140, "L")
