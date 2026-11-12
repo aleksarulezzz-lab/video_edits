@@ -6,12 +6,15 @@ export const UI = "Inter";
 export const SERIF = "Lora";
 // words behind the author: black rounded type
 export const ROUND = "Nunito";
+// words behind the author: white elegant italic
+export const ELEGANT = "Playfair Display";
 export const fontsReady = Promise.all([
   ...(["600", "700"] as const).flatMap((w) =>
     ["cyrillic", "latin"].map((s) => loadFont({ family: UI, url: staticFile(`fonts/inter-${s}-${w}-normal.woff2`), weight: w })),
   ),
   ...["cyrillic", "latin"].map((s) => loadFont({ family: SERIF, url: staticFile(`fonts/lora-${s}-700-normal.woff2`), weight: "700" })),
   ...["cyrillic", "latin"].map((s) => loadFont({ family: ROUND, url: staticFile(`fonts/nunito-${s}-800-normal.woff2`), weight: "800" })),
+  ...["cyrillic", "latin"].map((s) => loadFont({ family: ELEGANT, url: staticFile(`fonts/playfair-display-${s}-600-italic.woff2`), weight: "600", style: "italic" })),
   ...["cyrillic", "latin"].map((s) => loadFont({ family: SERIF, url: staticFile(`fonts/lora-${s}-700-italic.woff2`), weight: "700", style: "italic" })),
 ]);
 

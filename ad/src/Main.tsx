@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { C, EASE, FPS, GLOW, ROUND, SERIF, UI } from "./theme";
+import { C, EASE, FPS, GLOW, ELEGANT, ROUND, SERIF, UI } from "./theme";
 import { LogoPill, Mark, SideCaption, WindowLabel, ease, fade, glass } from "./glass";
 import { Grain, Sheet, Strip, jitter, torn } from "./paper";
 import { Guide, Insert, Listen, Plate } from "./inserts";
@@ -44,11 +44,16 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
   const pp = pipE ? ease(t, pipE.a - 0.25, 0.4) * interpolate(t, [pipE.b - 0.05, pipE.b + 0.3], [1, 0], clamp) : 0;
   const z = F.base * ((idx % 2 ? 1.12 : 1.0) + 0.03 * Math.min(1, f / Math.max(1, n)));
   const depth = EV.filter((e) => e.kind === "depth" && t >= e.a - 0.05 && t < e.b + 0.05);
+  const zoomed = (child: React.ReactNode) => (
+    <div style={{ position: "absolute", inset: 0, transformOrigin: `${F.x}px ${F.y}px`, transform: `scale(${z})` }}>{child}</div>
+  );
+  // the phrase sits in the frame (not zoomed), between the zoomed footage and her zoomed cut-out
   const frame = (
-    <div style={{ position: "absolute", inset: 0, transformOrigin: `${F.x}px ${F.y}px`, transform: `scale(${z})` }}>
-      <OffthreadVideo src={src} trimBefore={trim} volume={vol} style={{ width: 1920, height: 1080 }} />
-      {depth.map((e, i) => <DepthWord key={i} e={e} t={t} srcT={c.in + f / FPS} />)}
-    </div>
+    <>
+      {zoomed(<OffthreadVideo src={src} trimBefore={trim} volume={vol} style={{ width: 1920, height: 1080 }} />)}
+      {depth.map((e, i) => <DepthText key={`t${i}`} e={e} t={t} />)}
+      {depth.map((e, i) => zoomed(<DepthCut key={`c${i}`} e={e} srcT={c.in + f / FPS} />))}
+    </>
   );
   if (pp <= 0.001) return <AbsoluteFill style={{ overflow: "hidden", backgroundColor: C.cream }}>{frame}</AbsoluteFill>;
   const face = pipE ? FACEON(pipE) : true;
@@ -73,20 +78,29 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
   );
 };
 
-/** a huge word across the frame behind the author: footage, word, then her cut-out on top (black rounded type) */
-const DepthWord: React.FC<{ e: Ev; t: number; srcT: number }> = ({ e, t, srcT }) => {
-  const k = Math.max(0, Math.min(FG_FRAMES[e.name as string] - 1, Math.round((srcT - (e.src_a as number)) * FPS)));
-  const pIn = ease(t, e.a, 0.5), pOut = fade(t, e.b, 0.5);
-  const word = e.word as string;
-  // fits inside the frame even at the closer zoom (1.12): ~0.72 em per rounded capital
-  const size = Math.min(230, (1920 * 0.8) / (word.length * 0.72));
+let ctx: CanvasRenderingContext2D | null = null;
+const measure = (text: string, px: number) => {
+  ctx = ctx ?? document.createElement("canvas").getContext("2d");
+  ctx!.font = `italic 600 ${px}px "${ELEGANT}"`;
+  return ctx!.measureText(text).width;
+};
+
+/** words behind the author: white Playfair italic with a soft shadow */
+const DepthText: React.FC<{ e: Ev; t: number }> = ({ e, t }) => {
+  const pIn = ease(t, e.a, 0.55), pOut = fade(t, e.b, 0.5);
+  const text = e.word as string;
+  // measured width: the phrase spans ~1680 px of the 1920 frame
+  const size = Math.min(300, (1680 / measure(text, 100)) * 100);
   return (
-    <>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 330 - size * 0.5, textAlign: "center", fontFamily: ROUND, fontWeight: 800, fontSize: size,
-        lineHeight: 1, letterSpacing: 2, color: "#161616", opacity: 0.88 * pIn * pOut, transform: `scale(${0.96 + 0.04 * pIn})`, whiteSpace: "nowrap" }}>{word}</div>
-      <Img src={staticFile(`fg/${e.name}/${String(k).padStart(4, "0")}.webp`)} style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080 }} />
-    </>
+    <div style={{ position: "absolute", left: 0, right: 0, top: 250 - size * 0.62, textAlign: "center", fontFamily: ELEGANT, fontStyle: "italic", fontWeight: 600, fontSize: size,
+      lineHeight: 1, color: "#fff", opacity: pIn * pOut, transform: `translateY(${(1 - pIn) * 24}px)`, whiteSpace: "nowrap",
+      textShadow: "0 3px 6px rgba(20,25,45,0.35), 0 10px 40px rgba(20,25,45,0.35)" }}>{text}</div>
   );
+};
+/** her cut-out over the phrase (same zoom as the footage) */
+const DepthCut: React.FC<{ e: Ev; srcT: number }> = ({ e, srcT }) => {
+  const k = Math.max(0, Math.min(FG_FRAMES[e.name as string] - 1, Math.round((srcT - (e.src_a as number)) * FPS)));
+  return <Img src={staticFile(`fg/${e.name}/${String(k).padStart(4, "0")}.webp`)} style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080 }} />;
 };
 
 /** a number is not readable when the author covers it: it stands on the free wall in front of the footage */

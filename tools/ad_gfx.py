@@ -56,11 +56,11 @@ a = at("main", "Лайфхак", 560, -0.35)
 add("stinger", a, a + 1.3, title="Лайфхак", variant="yellow")
 
 # words behind the author (cut-outs from tools/ad_matte.py: name, source, matte start)
-for name, word, src, ph, after, m0 in [("bez", "БЕЗ ДИЗАЙНЕРА", "main", "ни разу не эмоушн", 140, 144.9),
-                                       ("snachala", "СНАЧАЛА ТЕКСТ", "main", "сначала ты мне подготовь", 430, 434.6),
-                                       ("golos", "ЖИВОЙ ГОЛОС", "main", "Голос я сгенерировала", 548, 549.8),
-                                       ("glaza", "ГЛАЗА И ВКУС ТВОИ", "dg", "ваши глаза", 70, 73.6),
-                                       ("zamysel", "ЗАМЫСЕЛ + ГОЛОС", "main", "есть замысел", 970, 974.6)]:
+for name, word, src, ph, after, m0 in [("bez", "Без дизайнера", "main", "ни разу не эмоушн", 140, 144.9),
+                                       ("snachala", "Сначала текст", "main", "сначала ты мне подготовь", 430, 434.6),
+                                       ("golos", "Живой голос", "main", "Голос я сгенерировала", 548, 549.8),
+                                       ("glaza", "Глаза и вкус твои", "dg", "ваши глаза", 70, 73.6),
+                                       ("zamysel", "Замысел + голос", "main", "есть замысел", 970, 974.6)]:
     s = find(src, ph, after)
     a = T(src, s)
     add("depth", a, a + 3.2, name=name, word=word, src=src, src_a=m0)
