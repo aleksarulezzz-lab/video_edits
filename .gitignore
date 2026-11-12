@@ -3,3 +3,7 @@ content-week/public/media/
 content-week/out/
 chinese/transcript/pron16k.wav
 chinese/public/assets/
+ad/src/
+ad/qc/
+ad/transcript/*.wav
+ad/transcript/log.txt
