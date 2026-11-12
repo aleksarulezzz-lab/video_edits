@@ -8,3 +8,4 @@ ad/qc/
 ad/transcript/*.wav
 ad/transcript/log.txt
 ad/plan/*.jpg
+ad/out/
