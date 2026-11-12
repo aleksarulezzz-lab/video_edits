@@ -87,22 +87,34 @@ for name, title, segs in REELS:
                 if e["kind"] in WINDOW and e["a"] < b and e["b"] > a and not (e["kind"] == "clip" and e.get("mode") == "full" and False):
                     looks.append({"a": round(max(a, e["a"]) - a + off, 3), "b": round(min(b, e["b"]) - a + off, 3), "kind": e["kind"]})
         off += b - a
-    # short pages for a narrow frame: long pages are split by words, time shared by length
+    # pages for a narrow frame: up to ~46 characters (two lines); longer ones split at punctuation, then words
+    def pieces(text):
+        if len(text) <= 46:
+            return [text]
+        parts = re.split(r"(?<=[.,!?:;…])\s+", text)
+        out, cur = [], ""
+        for prt in parts:
+            if cur and len(cur) + 1 + len(prt) > 46:
+                out.append(cur); cur = prt
+            else:
+                cur = (cur + " " + prt).strip()
+        if cur:
+            out.append(cur)
+        res = []
+        for o in out:  # still too long: split by words into halves
+            while len(o) > 46:
+                ws = o.split(); k = len(ws) // 2
+                res.append(" ".join(ws[:k])); o = " ".join(ws[k:])
+            res.append(o)
+        return res
     short = []
     for sb in subs:
-        ws = sb["text"].split()
-        chunks, cur = [], []
-        for w in ws:
-            if cur and len(" ".join(cur + [w])) > 34:
-                chunks.append(cur); cur = []
-            cur.append(w)
-        if cur:
-            chunks.append(cur)
-        total = sum(len(" ".join(c)) for c in chunks) or 1
+        chunks = pieces(sb["text"])
+        total = sum(len(c) for c in chunks) or 1
         t0 = sb["a"]
         for c in chunks:
-            d = (sb["b"] - sb["a"]) * len(" ".join(c)) / total
-            short.append({"a": round(t0, 3), "b": round(t0 + d, 3), "text": " ".join(c)})
+            d = (sb["b"] - sb["a"]) * len(c) / total
+            short.append({"a": round(t0, 3), "b": round(t0 + d, 3), "text": c})
             t0 += d
     subs = short
     if subs and subs[0]["text"][:1].islower():

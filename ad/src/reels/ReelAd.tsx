@@ -18,8 +18,8 @@ export const REELS = data as ReelData[];
 export const END = 4.0;
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
-const CROP_X = 990 - 500; // a 1000-px wide column around her face
-const K = 1.08;
+const CROP_X = 620; // a 760-px column around her face (the side captions of the long video stay outside)
+const K = 1080 / 760;
 
 const LongPart: React.FC<{ d: ReelData; p: Part; n: number }> = ({ d, p, n }) => {
   const f = useCurrentFrame();
@@ -74,7 +74,7 @@ const Subs: React.FC<{ d: ReelData; t: number; top: number }> = ({ d, t, top }) 
   const k = ease(t, s.a, 0.12);
   return (
     <div style={{ position: "absolute", left: 70, right: 70, top, display: "flex", justifyContent: "center", opacity: k, transform: `translateY(${(1 - k) * 8}px)` }}>
-      <div style={{ padding: "12px 26px 14px", borderRadius: 22, background: "rgba(29,42,85,0.86)", fontFamily: UI, fontWeight: 700, fontSize: 54, lineHeight: 1.18, color: "#fff", textAlign: "center" }}>{s.text}</div>
+      <div style={{ maxWidth: 900, padding: "12px 26px 14px", borderRadius: 22, background: "rgba(29,42,85,0.86)", fontFamily: UI, fontWeight: 700, fontSize: 52, lineHeight: 1.18, color: "#fff", textAlign: "center" }}>{s.text}</div>
     </div>
   );
 };
@@ -149,7 +149,7 @@ export const ReelAd: React.FC<{ n: number }> = ({ n }) => {
       })}
       {t < d.duration ? (
         <>
-          <Title lines={d.title} t={t} until={rv ? 3.2 : d.duration} />
+          {!rv ? <Title lines={d.title} t={t} until={d.duration} /> : null}
           <Subs d={d} t={t} top={rv ? 1580 : 1430} />
         </>
       ) : null}
