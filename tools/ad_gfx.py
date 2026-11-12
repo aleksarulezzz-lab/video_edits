@@ -170,11 +170,11 @@ a = at("main", "Поскольку ролик получился", 746)
 add("broll", a, a + 2.8, file="broll/a-finger-scrolling-through-a-smartphone.mp4", at=2.0)
 logo("claudecode", "main", "в режиме Клод Код", 770, label="Claude Code")
 a = at("main", "в режиме Клод Код", 770, 1.4)
-add("screen", a, a + 4.0, file="sc/sc_claudecode_vertical.mp4", at=4.0, speed=1.5, crop=[300, 70, 1320, 900],
+add("screen", a, a + 4.0, file="sc/sc_claudecode_vertical.mp4", at=8.5, speed=1.5, crop=[440, 180, 1380, 800],
     label="Claude Code: наработки", logo="claudecode")
 side("«Тот же ролик, только вертикальный»", "main", "напишите, что сделает", 787, "L", d=3.4)
 a = at("main", "И открыла в Клод код", 803)
-add("screen", a, a + 3.6, file="sc/sc_claudecode_vertical.mp4", at=18.0, speed=1.0, crop=[300, 70, 1320, 900],
+add("screen", a, a + 3.6, file="sc/sc_claudecode_vertical.mp4", at=18.0, speed=1.0, crop=[440, 180, 1380, 800],
     label="Claude Code: одна фраза", logo="claudecode")
 
 # ---- block 9: summary, tier list over the frozen take ----
@@ -216,6 +216,12 @@ add("guide", a, a + 7.0)
 a = at("main", "ссылка будет в описании", 1230, -1.5)
 add("plate", a, a + 5.0, text="t.me/zapuskator_A")
 
+# her face stays in a circle next to a window only while her speech runs without a single cut;
+# where the take is stitched together the window goes full size and the face goes away
+joins = [c["out"] for c in clips[1:]]
+for e in ev:
+    if e["kind"] in ("screen", "clip", "endcard") and e.get("mode") != "full":
+        e["face"] = not any(e["a"] - 0.2 < j < e["b"] + 0.2 for j in joins)
 ev.sort(key=lambda e: e["a"])
 total = clips[-1]["out"] + clips[-1]["dur"]
 json.dump({"total": total, "events": ev}, open(f"{root}/src/data/gfx.json", "w"), ensure_ascii=False, indent=0)

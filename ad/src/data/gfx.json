@@ -104,7 +104,8 @@
 840
 ],
 "label": "Pinterest: поиск референса",
-"logo": "pinterest"
+"logo": "pinterest",
+"face": false
 },
 {
 "kind": "side",
@@ -138,7 +139,8 @@
 1080
 ],
 "label": "Save As Bot: вставляю ссылку",
-"logo": "telegram"
+"logo": "telegram",
+"face": false
 },
 {
 "kind": "screen",
@@ -154,7 +156,8 @@
 1080
 ],
 "label": "Save As Bot: сохраняю видео",
-"logo": "telegram"
+"logo": "telegram",
+"face": false
 },
 {
 "kind": "stinger",
@@ -182,7 +185,8 @@
 815
 ],
 "label": "Claude: сначала текст",
-"logo": "claude"
+"logo": "claude",
+"face": false
 },
 {
 "kind": "depth",
@@ -222,7 +226,8 @@
 700,
 416
 ]
-]
+],
+"face": false
 },
 {
 "kind": "clip",
@@ -231,7 +236,8 @@
 "file": "media/rh.mp4",
 "at": 5.0,
 "mode": "window",
-"label": "×2,4 за 3 года (из ролика)"
+"label": "×2,4 за 3 года (из ролика)",
+"face": true
 },
 {
 "kind": "side",
@@ -280,7 +286,8 @@
 820
 ],
 "label": "ElevenLabs: текст для озвучки",
-"logo": "elevenlabs"
+"logo": "elevenlabs",
+"face": true
 },
 {
 "kind": "side",
@@ -6416,7 +6423,8 @@
 815
 ],
 "label": "Claude: озвучка, фото, скрин",
-"logo": "claude"
+"logo": "claude",
+"face": true
 },
 {
 "kind": "broll",
@@ -6447,7 +6455,8 @@
 "file": "media/rh.mp4",
 "at": 54.2,
 "mode": "window",
-"label": "Вырезанное фото с обводкой"
+"label": "Вырезанное фото с обводкой",
+"face": false
 },
 {
 "kind": "side",
@@ -6472,7 +6481,8 @@
 "at": 64.6,
 "mode": "window",
 "label": "Ошибка 1: город в океане",
-"mark": "circle"
+"mark": "circle",
+"face": true
 },
 {
 "kind": "insert",
@@ -6488,12 +6498,14 @@
 "at": 79.6,
 "mode": "window",
 "label": "Ошибка 2: надписи по старому тексту",
-"mark": "strike"
+"mark": "strike",
+"face": true
 },
 {
 "kind": "endcard",
 "a": 280.963,
-"b": 287.323
+"b": 287.323,
+"face": false
 },
 {
 "kind": "clip",
@@ -6502,7 +6514,8 @@
 "file": "media/rv.mp4",
 "at": 91.0,
 "mode": "phone",
-"label": "Исправлено: ссылка на канал"
+"label": "Исправлено: ссылка на канал",
+"face": true
 },
 {
 "kind": "depth",
@@ -6542,16 +6555,17 @@
 "a": 331.577,
 "b": 335.577,
 "file": "sc/sc_claudecode_vertical.mp4",
-"at": 4.0,
+"at": 8.5,
 "speed": 1.5,
 "crop": [
-300,
-70,
-1320,
-900
+440,
+180,
+1380,
+800
 ],
 "label": "Claude Code: наработки",
-"logo": "claudecode"
+"logo": "claudecode",
+"face": false
 },
 {
 "kind": "side",
@@ -6570,13 +6584,14 @@
 "at": 18.0,
 "speed": 1.0,
 "crop": [
-300,
-70,
-1320,
-900
+440,
+180,
+1380,
+800
 ],
 "label": "Claude Code: одна фраза",
-"logo": "claudecode"
+"logo": "claudecode",
+"face": true
 },
 {
 "kind": "clip",
@@ -6587,7 +6602,8 @@
 "mode": "pair",
 "file2": "media/rv.mp4",
 "at2": 20.0,
-"label": "YouTube + Reels"
+"label": "YouTube + Reels",
+"face": false
 },
 {
 "kind": "tier",

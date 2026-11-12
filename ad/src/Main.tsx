@@ -26,6 +26,7 @@ const FACE: Record<string, { x: number; y: number; base: number }> = {
 };
 // while one of these is on screen the author shrinks to a circle in the corner and her frame blurs behind the window
 const PIP = (e: Ev) => e.kind === "screen" || (e.kind === "clip" && e.mode !== "full") || e.kind === "endcard";
+const FACEON = (e: Ev) => e.face !== false;
 const PIPC = { x: 1690, y: 820, r: 165 };
 const FG_FRAMES: Record<string, number> = { bez: 111, snachala: 150, golos: 114, glaza: 174, zamysel: 126, ot3000: 126 };
 
@@ -50,7 +51,8 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
     </div>
   );
   if (pp <= 0.001) return <AbsoluteFill style={{ overflow: "hidden", backgroundColor: C.cream }}>{frame}</AbsoluteFill>;
-  // picture-in-picture: blurred backdrop + the face in a ring
+  const face = pipE ? FACEON(pipE) : true;
+  // picture-in-picture: blurred backdrop + the face in a ring (no ring where the take is stitched)
   const k = 0.62;
   const R = interpolate(pp, [0, 1], [1300, PIPC.r]);
   const cx = interpolate(pp, [0, 1], [F.x, PIPC.x]), cy = interpolate(pp, [0, 1], [F.y, PIPC.y]);
@@ -61,7 +63,7 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
         <OffthreadVideo src={src} trimBefore={trim} muted style={{ width: 1920, height: 1080 }} />
       </AbsoluteFill>
       <AbsoluteFill style={{ background: `radial-gradient(90% 80% at 40% 45%, rgba(47,95,208,${0.22 * pp}), rgba(29,42,85,${0.62 * pp}))` }} />
-      <div style={{ position: "absolute", left: cx - R, top: cy - R, width: 2 * R, height: 2 * R, borderRadius: "50%", overflow: "hidden",
+      <div style={{ position: "absolute", left: cx - R, top: cy - R, width: 2 * R, height: 2 * R, borderRadius: "50%", overflow: "hidden", opacity: face ? 1 : 1 - pp,
         boxShadow: pp > 0.5 ? `0 0 0 5px ${C.cream}, 0 0 0 8px ${C.blue}, 0 0 40px rgba(111,155,255,0.75), 0 18px 40px rgba(0,0,0,0.45)` : undefined }}>
         <div style={{ position: "absolute", left: R - F.x * s * z, top: R - F.y * s * z, width: 1920 * s * z, height: 1080 * s * z }}>
           <OffthreadVideo src={src} trimBefore={trim} muted style={{ width: "100%", height: "100%" }} />
@@ -101,10 +103,12 @@ const WallNumber: React.FC<{ t: number; e: Ev }> = ({ t, e }) => {
 };
 
 /* ---------- windows: screencasts and pieces of the finished ad ---------- */
-const BOX = { x: 110, y: 90, w: 1340, h: 840 };
-const fit = (w: number, h: number) => {
-  const k = Math.min(BOX.w / w, BOX.h / h);
-  return { w: w * k, h: h * k, x: BOX.x + (BOX.w - w * k) / 2, y: BOX.y + (BOX.h - h * k) / 2 };
+const BOX = { x: 110, y: 90, w: 1340, h: 840 };      // next to the face circle
+const BOXC = { x: 150, y: 70, w: 1620, h: 860 };     // centred, no face
+const fit = (w: number, h: number, centred = false) => {
+  const B = centred ? BOXC : BOX;
+  const k = Math.min(B.w / w, B.h / h);
+  return { w: w * k, h: h * k, x: B.x + (B.w - w * k) / 2, y: B.y + (B.h - h * k) / 2 };
 };
 const glow = (p: number) => `0 0 0 2px rgba(150,180,255,${0.95 * p}), 0 0 26px 6px rgba(47,95,208,${0.85 * p}), 0 0 80px 18px rgba(111,155,255,${0.42 * p}), 0 30px 70px rgba(0,0,0,0.45)`;
 
@@ -117,7 +121,7 @@ const Screen: React.FC<{ e: Ev }> = ({ e }) => {
   // crop rectangle animates to the zoom rectangle (on the important line) from fraction zoom[0] of the piece
   const zp = zoom ? interpolate(f / n, [zoom[0], zoom[0] + 0.12], [0, 1], { ...clamp, easing: EASE.inOut }) : 0;
   const r = zoom ? [cx + (zoom[1][0] - cx) * zp, cy + (zoom[1][1] - cy) * zp, cw + (zoom[1][2] - cw) * zp, ch + (zoom[1][3] - ch) * zp] : [cx, cy, cw, ch];
-  const box = fit(cw, ch);
+  const box = fit(cw, ch, !FACEON(e));
   const k = Math.max(box.w / r[2], box.h / r[3]);
   const p = ease(t, e.a, 0.4) * fade(t, e.b, 0.3);
   const speed = (e.speed as number) ?? 1;
@@ -157,9 +161,9 @@ const ClipWin: React.FC<{ e: Ev }> = ({ e }) => {
       </div>
     </div>
   );
-  if (e.mode === "phone") return <AbsoluteFill>{phone(e.file as string, e.at as number, 520, 70, 840)}<WindowLabel text={e.label as string} x={520} y={970} p={p} /></AbsoluteFill>;
+  if (e.mode === "phone") return <AbsoluteFill>{phone(e.file as string, e.at as number, FACEON(e) ? 520 : 720, 70, 840)}<WindowLabel text={e.label as string} x={520} y={970} p={p} /></AbsoluteFill>;
   const pair = e.mode === "pair";
-  const box = pair ? { x: 90, y: 200, w: 960, h: 540 } : fit(1920, 1080);
+  const box = pair ? { x: 90, y: 220, w: 900, h: 506 } : fit(1920, 1080, !FACEON(e));
   const mark = e.mark as string | undefined;
   const mp = ease(t, e.a + 0.7, 0.5);
   return (
@@ -177,7 +181,7 @@ const ClipWin: React.FC<{ e: Ev }> = ({ e }) => {
           </svg>
         ) : null}
       </div>
-      {pair ? phone(e.file2 as string, e.at2 as number, 1120, 110, 760) : null}
+      {pair ? phone(e.file2 as string, e.at2 as number, FACEON(e) ? 1030 : 1180, 110, 740) : null}
       <WindowLabel text={e.label as string} x={box.x + 24} y={box.y + box.h + 22} p={p} />
     </AbsoluteFill>
   );
@@ -188,7 +192,7 @@ const EndCard: React.FC<{ e: Ev }> = ({ e }) => {
   const f = useCurrentFrame();
   const t = e.a + f / FPS;
   const p = ease(t, e.a, 0.4) * fade(t, e.b, 0.3);
-  const box = fit(1920, 1080);
+  const box = fit(1920, 1080, !FACEON(e));
   const k = box.w / 1920;
   const strike = ease(t, e.a + 1.4, 0.6);
   const fix = ease(t, e.a + 2.6, 0.45, EASE.spring);
