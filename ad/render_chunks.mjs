@@ -9,7 +9,7 @@ const composition = await selectComposition({ serveUrl, id: "Main", browserExecu
 for (const r of process.argv.slice(2)) {
   const [a, b] = r.split("-").map(Number);
   await renderMedia({
-    composition, serveUrl, browserExecutable, codec: "h264", audioCodec: "pcm-16", crf: 16, concurrency: 3,
+    composition, serveUrl, browserExecutable, codec: "h264", audioCodec: "pcm-16", crf: 16, concurrency: 2, timeoutInMilliseconds: 240000,
     frameRange: [a, b], outputLocation: `out/chunk_${a}.mkv`, imageFormat: "jpeg", jpegQuality: 92,
     onProgress: ({ progress }) => { if (Math.round(progress * 100) % 10 === 0) process.stdout.write(`${r} ${Math.round(progress * 100)}%\n`); },
   });

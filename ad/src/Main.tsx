@@ -68,12 +68,12 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
         <OffthreadVideo src={src} trimBefore={trim} muted style={{ width: 1920, height: 1080 }} />
       </AbsoluteFill>
       <AbsoluteFill style={{ background: `radial-gradient(90% 80% at 40% 45%, rgba(47,95,208,${0.22 * pp}), rgba(29,42,85,${0.62 * pp}))` }} />
-      <div style={{ position: "absolute", left: cx - R, top: cy - R, width: 2 * R, height: 2 * R, borderRadius: "50%", overflow: "hidden", opacity: face ? 1 : 1 - pp,
+      {face || pp < 0.99 ? <div style={{ position: "absolute", left: cx - R, top: cy - R, width: 2 * R, height: 2 * R, borderRadius: "50%", overflow: "hidden", opacity: face ? 1 : 1 - pp,
         boxShadow: pp > 0.5 ? `0 0 0 5px ${C.cream}, 0 0 0 8px ${C.blue}, 0 0 40px rgba(111,155,255,0.75), 0 18px 40px rgba(0,0,0,0.45)` : undefined }}>
         <div style={{ position: "absolute", left: R - F.x * s * z, top: R - F.y * s * z, width: 1920 * s * z, height: 1080 * s * z }}>
           <OffthreadVideo src={src} trimBefore={trim} muted style={{ width: "100%", height: "100%" }} />
         </div>
-      </div>
+      </div> : null}
     </AbsoluteFill>
   );
 };
@@ -143,7 +143,8 @@ const Screen: React.FC<{ e: Ev }> = ({ e }) => {
     <AbsoluteFill>
       <div style={{ position: "absolute", left: box.x, top: box.y, width: box.w, height: box.h, borderRadius: 28, overflow: "hidden", background: "#fff",
         opacity: p, transform: `scale(${0.95 + 0.05 * p})`, boxShadow: glow(p) }}>
-        <OffthreadVideo src={staticFile(e.file as string)} trimBefore={Math.round((e.at as number) * FPS)} playbackRate={speed} muted
+        {/* with a playback rate Remotion reads trimBefore in sped-up time: scale it so the piece starts at `at` seconds of the source */}
+        <OffthreadVideo src={staticFile(e.file as string)} trimBefore={Math.round((e.at as number) * speed * FPS)} playbackRate={speed} muted
           style={{ position: "absolute", left: -r[0] * k + (box.w - r[2] * k) / 2, top: -r[1] * k + (box.h - r[3] * k) / 2, width: 1920 * k, height: 1080 * k, maxWidth: "none" }} />
         {speed >= 1.5 ? (
           <div style={{ position: "absolute", right: 18, top: 16, ...glass(true), borderRadius: 16, padding: "6px 16px", fontFamily: UI, fontWeight: 700, fontSize: 30, color: "#fff" }}>×{speed.toFixed(1).replace(".0", "").replace(".", ",")}</div>
@@ -294,10 +295,10 @@ const Tier: React.FC<{ e: Ev }> = ({ e }) => {
       {shots && cur ? (
         <div style={{ position: "absolute", left: 1150, top: 170, width: 680, height: 720, borderRadius: 26, overflow: "hidden", boxShadow: glow(ease(t, cur.at, 0.4)), background: "#fff" }}>
           {cur.shot ? (
-            <OffthreadVideo key={cur.at} src={staticFile(shots)} trimBefore={Math.round(cur.shot * FPS)} muted playbackRate={0.25}
+            <OffthreadVideo key={cur.at} src={staticFile(shots)} trimBefore={Math.round(cur.shot * 0.25 * FPS)} muted playbackRate={0.25}
               style={{ position: "absolute", left: -330, top: -40, width: 1920 * 0.8, height: 1080 * 0.8, maxWidth: "none" }} />
           ) : (
-            <OffthreadVideo key={cur.at} src={staticFile("sc/sc_flax_stats.mp4")} trimBefore={Math.round(30 * FPS)} muted playbackRate={0.25}
+            <OffthreadVideo key={cur.at} src={staticFile("sc/sc_flax_stats.mp4")} trimBefore={Math.round(30 * 0.25 * FPS)} muted playbackRate={0.25}
               style={{ position: "absolute", left: -260, top: -170, width: 1920 * 0.78, height: 1080 * 0.78, maxWidth: "none" }} />
           )}
         </div>
