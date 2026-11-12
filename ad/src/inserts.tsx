@@ -1,6 +1,5 @@
 import React from "react";
 import { AbsoluteFill, Img, OffthreadVideo, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { useAudioData, visualizeAudio } from "@remotion/media-utils";
 import { C, EASE, FPS, GLOW, SERIF, UI } from "./theme";
 import { Mark, ease, fade, glass } from "./glass";
 import { Grain, PaperBg, Sheet, Strip, jitter, rnd, step, torn } from "./paper";
@@ -256,20 +255,18 @@ export const Insert: React.FC<{ e: Ev }> = ({ e }) => {
 /* ---------- listening to the generated voice: nothing but the voice, bars react to it ---------- */
 export const Listen: React.FC<{ e: Ev }> = ({ e }) => {
   const f = useCurrentFrame();
-  const audio = useAudioData(staticFile("media/el.wav"));
-  const t0 = 16.85; // where the clip starts inside the voice-over file
   const d = e.b - e.a;
   const o = interpolate(f / FPS, [0, 0.3, d - 0.35, d], [0, 1, 1, 0], clamp);
-  const N = 28;
-  const vals = audio ? visualizeAudio({ fps: FPS, frame: Math.round(t0 * FPS) + f, audioData: audio, numberOfSamples: 64, smoothing: true }).slice(1, N + 1) : Array(N).fill(0);
+  const B = e.bands as number[][];
+  const vals = B[Math.min(B.length - 1, f)] ?? [];
   return (
     <AbsoluteFill style={{ opacity: o, background: `radial-gradient(80% 70% at 50% 45%, #253a78, ${C.navy})` }}>
       <Grain seed={7} opacity={0.22} />
       <div style={{ position: "absolute", left: 0, right: 0, top: 260, height: 420, display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
         {vals.map((v: number, i: number) => {
-          const h = 24 + Math.min(1, Math.pow(v * 9, 0.7)) * 380;
+          const h = 24 + v * 380;
           return <div key={i} style={{ width: 34, height: h, borderRadius: 14, background: "linear-gradient(180deg, rgba(255,255,255,0.75), rgba(111,155,255,0.55))",
-            border: "1px solid rgba(255,255,255,0.8)", boxShadow: `0 0 18px rgba(111,155,255,${0.25 + v * 2})`, backdropFilter: "blur(10px)" }} />;
+            border: "1px solid rgba(255,255,255,0.8)", boxShadow: `0 0 18px rgba(111,155,255,${0.25 + v * 0.6})`, backdropFilter: "blur(10px)" }} />;
         })}
       </div>
       <div style={{ position: "absolute", left: 0, right: 0, top: 760, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>

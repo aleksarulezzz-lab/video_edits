@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { C, EASE, FPS, GLOW, SERIF, UI } from "./theme";
+import { C, EASE, FPS, GLOW, ROUND, SERIF, UI } from "./theme";
 import { LogoPill, Mark, SideCaption, WindowLabel, ease, fade, glass } from "./glass";
 import { Grain, Sheet, Strip, jitter, torn } from "./paper";
 import { Guide, Insert, Listen, Plate } from "./inserts";
@@ -71,19 +71,32 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
   );
 };
 
-/** a huge word across the frame behind the author: footage, word, then her cut-out on top */
+/** a huge word across the frame behind the author: footage, word, then her cut-out on top (black rounded type) */
 const DepthWord: React.FC<{ e: Ev; t: number; srcT: number }> = ({ e, t, srcT }) => {
   const k = Math.max(0, Math.min(FG_FRAMES[e.name as string] - 1, Math.round((srcT - (e.src_a as number)) * FPS)));
   const pIn = ease(t, e.a, 0.5), pOut = fade(t, e.b, 0.5);
   const word = e.word as string;
-  const size = Math.min(270, (1920 * 0.9) / (word.length * 0.62));
+  // fits inside the frame even at the closer zoom (1.12): ~0.72 em per rounded capital
+  const size = Math.min(230, (1920 * 0.8) / (word.length * 0.72));
   return (
     <>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 300 - size * 0.45, textAlign: "center", fontFamily: UI, fontWeight: 700, fontSize: size,
-        lineHeight: 1, letterSpacing: -size * 0.03, color: C.blue, opacity: 0.86 * pIn * pOut, transform: `scale(${0.94 + 0.06 * pIn})`, whiteSpace: "nowrap",
-        textShadow: "0 6px 24px rgba(47,95,208,0.25)" }}>{word}</div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 330 - size * 0.5, textAlign: "center", fontFamily: ROUND, fontWeight: 800, fontSize: size,
+        lineHeight: 1, letterSpacing: 2, color: "#161616", opacity: 0.88 * pIn * pOut, transform: `scale(${0.96 + 0.04 * pIn})`, whiteSpace: "nowrap" }}>{word}</div>
       <Img src={staticFile(`fg/${e.name}/${String(k).padStart(4, "0")}.webp`)} style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080 }} />
     </>
+  );
+};
+
+/** a number is not readable when the author covers it: it stands on the free wall in front of the footage */
+const WallNumber: React.FC<{ t: number; e: Ev }> = ({ t, e }) => {
+  const p = ease(t, e.a, 0.45, EASE.spring) * fade(t, e.b, 0.45);
+  const [small, big] = (e.word as string).split("|");
+  return (
+    <div style={{ position: "absolute", left: 60, top: 110, opacity: p, transform: `translateX(${(1 - p) * -60}px)`, ...glass(), padding: "22px 40px 30px",
+      fontFamily: ROUND, fontWeight: 800, color: "#161616", lineHeight: 0.95 }}>
+      <div style={{ fontSize: 80 }}>{small}</div>
+      <div style={{ fontSize: 130, letterSpacing: 1, whiteSpace: "nowrap" }}>{big}</div>
+    </div>
   );
 };
 
@@ -192,7 +205,7 @@ const EndCard: React.FC<{ e: Ev }> = ({ e }) => {
         <svg style={{ position: "absolute", inset: 0 }} viewBox="0 0 1920 1080">
           <path d="M80 590 C 400 560, 700 600, 1030 570" stroke={C.red} strokeWidth={22} fill="none" strokeLinecap="round" strokeDasharray={1000} strokeDashoffset={1000 * (1 - strike)} />
         </svg>
-        <div style={{ position: "absolute", left: 140 * k, top: 455 * k, opacity: fix, transform: `scale(${0.7 + 0.3 * fix}) rotate(-3deg)`, transformOrigin: "left center" }}>
+        <div style={{ position: "absolute", left: 160 * k, top: 760 * k, opacity: fix, transform: `scale(${0.7 + 0.3 * fix}) rotate(-3deg)`, transformOrigin: "left center" }}>
           <Strip text="→ t.me/zapuskator_A" bg={C.yellow} size={74 * k} seed={33} rot={0} />
         </div>
       </div>
@@ -319,12 +332,13 @@ export const Main: React.FC = () => {
       {EV.map((e, i) => (e.kind === "tier" ? seq(e, i, <Tier e={e} />) : null))}
       {EV.map((e, i) => (e.kind === "listen" ? seq(e, i, <Listen e={e} />) : null))}
       {EV.map((e, i) => (e.kind === "guide" ? seq(e, i, <Guide e={e} />) : null))}
+      {EV.filter((e) => e.kind === "wallnum" && on(e, t, 0.5)).map((e, i) => <WallNumber key={`w${i}`} t={t} e={e} />)}
       {!covered ? sides.map((e, i) => <SideCaption key={`c${i}`} t={t} a={e.a} b={e.b} text={e.text as string} side={e.side as string} slot={0} icon={e.icon as string} big={!!e.big} />) : null}
       {!covered ? EV.filter((e) => e.kind === "logo" && on(e, t, 0.4)).map((e, i) => <LogoPill key={`l${i}`} t={t} a={e.a} b={e.b} logo={e.logo as string} label={e.label as string} side={e.side as string} />) : null}
       {EV.filter((e) => e.kind === "plate" && on(e, t, 0.4)).map((e, i) => <Plate key={`p${i}`} t={t} e={e} />)}
       {EV.map((e, i) => (e.kind === "stinger" ? seq(e, i, <Stinger e={e} />, 10) : null))}
       {EV.map((e, i) => {
-        const s = e.kind === "stinger" || e.kind === "insert" || e.kind === "guide" ? ["paper", 0.16] : e.kind === "side" || e.kind === "logo" || e.kind === "plate" ? ["puff", 0.08] : e.kind === "depth" ? ["swell", 0.07] : null;
+        const s = e.kind === "stinger" || e.kind === "insert" || e.kind === "guide" ? ["paper", 0.16] : e.kind === "side" || e.kind === "logo" || e.kind === "plate" ? ["puff", 0.08] : e.kind === "depth" || e.kind === "wallnum" ? ["swell", 0.07] : null;
         return s ? <SFX key={`x${i}`} at={e.a} kind={s[0] as string} vol={s[1] as number} /> : null;
       })}
     </AbsoluteFill>

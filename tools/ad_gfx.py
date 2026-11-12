@@ -60,11 +60,14 @@ for name, word, src, ph, after, m0 in [("bez", "БЕЗ ДИЗАЙНЕРА", "mai
                                        ("snachala", "СНАЧАЛА ТЕКСТ", "main", "сначала ты мне подготовь", 430, 434.6),
                                        ("golos", "ЖИВОЙ ГОЛОС", "main", "Голос я сгенерировала", 548, 549.8),
                                        ("glaza", "ГЛАЗА И ВКУС ТВОИ", "dg", "ваши глаза", 70, 73.6),
-                                       ("zamysel", "ЗАМЫСЕЛ + ГОЛОС", "main", "есть замысел", 970, 974.6),
-                                       ("ot3000", "ОТ 3 000 ₽", "main", "стоит от 3000", 1075, 1078.8)]:
+                                       ("zamysel", "ЗАМЫСЕЛ + ГОЛОС", "main", "есть замысел", 970, 974.6)]:
     s = find(src, ph, after)
     a = T(src, s)
     add("depth", a, a + 3.2, name=name, word=word, src=src, src_a=m0)
+
+# the price stands on the free wall in front of the author (a number behind her is not readable)
+a = at("main", "стоит от 3000", 1075)
+add("wallnum", a, a + 3.6, word="ОТ|3 000 ₽")
 
 # ---- block 1: the finished ad, then the hook ----
 side("Этот ролик сделала нейросеть", "main", "Вот этот ролик", 140, "L")
@@ -90,22 +93,22 @@ add("screen", a, at("main", "Мне понравился бумажный", 340,
 side("Бумажный коллаж", "main", "бумажный коллаж", 340, "L", d=3.2)
 side("Беру только стиль, тексты свои", "main", "брать только стиль", 348, "R")
 a = at("main", "я скачала это видео", 355)
-add("screen", a, a + 3.0, file="sc/sc_pinterest.mp4", at=40.0, speed=1.0, crop=[1035, 90, 885, 790],
+add("screen", a, a + 3.0, file="sc/sc_pinterest.mp4", at=42.0, speed=1.0, crop=[525, 0, 1395, 1080],
     label="Save As Bot: вставляю ссылку", logo="telegram")
-add("screen", a + 3.0, a + 6.2, file="sc/sc_pinterest.mp4", at=68.6, speed=1.0, crop=[1035, 90, 885, 790],
+add("screen", a + 3.0, a + 6.2, file="sc/sc_pinterest.mp4", at=69.3, speed=1.0, crop=[525, 0, 1395, 1080],
     label="Save As Bot: сохраняю видео", logo="telegram")
 
 # ---- block 4: script ----
 a = at("main", "просто надиктовала", 399, -0.2)
 add("insert", a, a + 4.2, name="voice")
 a = at("main", "отдала в Клод", 420)
-add("screen", a, at("main", "И сразу написала", 432, 1.8), file="sc/sc_claude_first.mp4", at=12.0, speed=1.0, crop=[440, 175, 1000, 815],
+add("screen", a, at("main", "И сразу написала", 432, 1.8), file="sc/sc_claude_first.mp4", at=6.0, speed=1.0, crop=[440, 175, 1000, 815],
     label="Claude: сначала текст", logo="claude")
 a = at("main", "потому что если она сразу", 449)
 add("insert", a, a + 4.6, name="textvideo")
 a = at("main", "нейросеть меня поправила", 466)
-add("screen", a, at("main", "Поэтому мы сохранили", 489, 2.8), file="sc/sc_claude_first.mp4", at=18.0, speed=0.8,
-    crop=[440, 175, 1000, 815], label="Claude: правка про «2–3% лимита»", logo="claude", zoom=[0.35, [470, 230, 900, 300]])
+add("screen", a, at("main", "Поэтому мы сохранили", 489, 2.8), file="sc/sc_claude_first.mp4", at=21.0, speed=0.8,
+    crop=[440, 395, 1000, 595], label="Claude: правка про «2–3% лимита»", logo="claude", zoom=[0.25, [460, 400, 700, 416]])
 a = at("main", "цифра рекламы", 495)
 add("clip", a, a + 4.2, file="media/rh.mp4", at=5.0, mode="window", label="×2,4 за 3 года (из ролика)")
 side("Источник: исследование рынка", "main", "нашла исследование", 500, "L", d=2.6)
@@ -118,7 +121,24 @@ add("screen", a, at("main", "Перед генерацией", 575, 2.6), file="
 side("Числа словами, «Клод» по-русски", "main", "Числа были прописаны", 565, "R")
 lis = [c for c in clips if c["src"] == "el"][0]
 add("broll", at("main", "Перед генерацией", 575, 2.6), lis["out"], file="broll/woman-putting-on-headphones.mp4", at=3.0)
-add("listen", lis["out"], lis["out"] + lis["dur"], voice="Nataly Vershinina · Calm & Friendly")
+# per-frame spectrum of the voice for the equaliser (28 log-spaced bands, 0..1)
+import subprocess, numpy as np
+sr = 22050
+x = np.frombuffer(subprocess.run(["ffmpeg", "-v", "error", "-i", f"{root}/src/elevenlabs_voice.mp3", "-ac", "1", "-ar", str(sr), "-f", "s16le", "-"],
+                                 capture_output=True).stdout, np.int16).astype(np.float32) / 32768
+edges = np.geomspace(90, 7000, 29)
+fr = np.fft.rfftfreq(2048, 1 / sr)
+bands = []
+for k in range(int(round(lis["dur"] * 30)) + 1):
+    c = int((lis["in"] + k / 30) * sr)
+    seg = x[max(0, c - 1024): c + 1024]
+    seg = np.pad(seg, (0, 2048 - len(seg))) * np.hanning(2048)
+    mag = np.abs(np.fft.rfft(seg))
+    bands.append([float(mag[(fr >= lo) & (fr < hi)].mean()) for lo, hi in zip(edges[:-1], edges[1:])])
+db = 20 * np.log10(np.array(bands) + 1e-7)
+top = np.percentile(db, 97, axis=0)  # per band: loudest moments reach the top
+bands = np.clip((db - (top - 38)) / 38, 0, 1) ** 1.3
+add("listen", lis["out"], lis["out"] + lis["dur"], voice="Nataly Vershinina · Calm & Friendly", bands=[[round(v, 2) for v in r] for r in bands.tolist()])
 
 # ---- block 6: animation ----
 a = at("main", "Дальше я отдала нейросети", 600)
@@ -187,7 +207,7 @@ for text, ic, shot in items:
     its.append({"text": text, "at": round(t, 3), "icon": ic, "shot": shot})
     t += rd(len(text.split()))
 add("tier", a, t + 3.5, title="Сколько платят", items=its, shots="sc/sc_freelance.mp4")
-a = [e for e in ev if e.get("name") == "ot3000"][0]["b"]
+a = [e for e in ev if e["kind"] == "wallnum"][0]["b"]
 add("insert", a, a + 4.4, name="price")
 
 # ---- block 12: guide and channel ----
