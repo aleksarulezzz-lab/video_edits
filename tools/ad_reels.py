@@ -41,14 +41,14 @@ def rng(a_ph, b_ph, after=0.0):
     return [round(a0 * FPS) / FPS, round(b0 * FPS) / FPS]
 
 REELS = [
-    ("reel_1_bez_dizainera", ["Этот рекламный ролик", "сделала нейросеть"], [rng("Вот этот ролик", "посреди океана", 9), rng("того теперь у меня", "для вашего видео", 340)]),
-    ("reel_2_oshibki", ["Нейросеть поселила меня", "посреди океана"], [rng("честно о том", "передать заказчику", 245)]),
-    ("reel_3_snachala_tekst", ["Не просите у нейросети", "сразу видео"], [rng("созвона в трекинг", "отсуточного лимита", 105)]),
-    ("reel_4_klod", ["Почему я написала", "Claude как «Клод»"], [rng("Теперь текст у меня", "открываете почту", 168)]),
-    ("reel_5_vakansiya", ["Вакансия: человек", "на анимации в Claude"], [rng("теперь деньги", "показала в видео", 425)]),
+    ("reel_1_bez_dizainera", ["Этот рекламный ролик", "сделала нейросеть"], [rng("Вот этот ролик", "посреди океана", 9), rng("того теперь у меня", "для вашего видео", 335)]),
+    ("reel_2_oshibki", ["Нейросеть поселила меня", "посреди океана"], [rng("честно о том", "передать заказчику", 240)]),
+    ("reel_3_snachala_tekst", ["Не просите у нейросети", "сразу видео"], [rng("Дальше начиналась", "отсуточного лимита", 95)]),
+    ("reel_4_klod", ["Почему я написала", "Claude как «Клод»"], [rng("Теперь текст у меня", "открываете почту", 160)]),
+    ("reel_5_vakansiya", ["Вакансия: человек", "на анимации в Claude"], [rng("А теперь про деньги", "показала в видео", 420)]),
     ("reel_6_reklama_dorozhaet", ["Реклама дорожает.", "А клиенты нужны каждый месяц"], [["rv", 0.0, 16.9]]),
     ("reel_7_drugoe_utro", ["Представьте", "другое утро…"], [["rv", 16.85, 37.75], ["rv", 45.9, 56.85]]),
-    ("reel_8_ne_tolko_golova", ["Рилсы не обязаны быть", "говорящей головой"], [rng("Но реклама", "делает за вас нейросеть", 380)]),
+    ("reel_8_ne_tolko_golova", ["Рилсы не обязаны быть", "говорящей головой"], [rng("Но реклама", "делает за вас нейросеть", 375)]),
 ]
 
 # ready vertical ad: subtitles from its own transcript (same text as the horizontal one)
@@ -56,7 +56,35 @@ RV = [{"a": s["start"], "b": s["end"], "text": s["text"]} for s in json.load(ope
 for s in RV:
     s["text"] = s["text"].replace("Клод", "Claude")
 
-WINDOW = {"screen", "clip", "endcard", "insert", "tier", "listen", "broll", "guide", "stinger"}
+WINDOW = {"screen", "clip", "endcard", "insert", "tier", "listen", "broll", "guide", "stinger", "step", "board", "stack", "vis"}
+# pauses inside a reel are cut (the long video keeps a few natural ones)
+import subprocess
+import numpy as np
+_x = np.frombuffer(subprocess.run(["ffmpeg", "-v", "error", "-i", f"{root}/out/final.mp4", "-ac", "1", "-ar", "16000", "-f", "s16le", "-"],
+                                  capture_output=True).stdout, np.int16).astype(np.float32) / 32768
+ENV = 20 * np.log10(np.sqrt(np.convolve(_x ** 2, np.ones(160) / 160, "same")[::160]) + 1e-6)
+def split_pauses(a, b, thr=-38, min_len=0.45, keep=0.14):
+    i, j = int(a * 100), int(b * 100)
+    q = ENV[i:j] < thr
+    out, cur, k = [], a, 0
+    while k < len(q):
+        if q[k]:
+            m = k
+            while m < len(q) and q[m]: m += 1
+            p0, p1 = a + k / 100, a + m / 100
+            if p1 - p0 >= min_len and p0 - cur > 0.3 and b - p1 > 0.3:
+                out.append([round(cur, 3), round(p0 + keep, 3)]); cur = p1 - keep
+            k = m
+        else: k += 1
+    out.append([round(cur, 3), round(b, 3)])
+    return out
+for r in range(len(REELS)):
+    n_, t_, segs_ = REELS[r]
+    new_segs = []
+    for sg in segs_:
+        new_segs += [sg] if sg[0] == "rv" else split_pauses(*sg)
+    REELS[r] = (n_, t_, new_segs)
+
 out = []
 for name, title, segs in REELS:
     off, parts, subs, looks = 0.0, [], [], []
