@@ -64,6 +64,8 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
   const s = interpolate(pp, [0, 1], [1, k]);
   return (
     <AbsoluteFill style={{ overflow: "hidden", backgroundColor: C.navy }}>
+      {/* her voice keeps going under the window: every picture layer below is muted */}
+      <Audio src={src} trimBefore={trim} volume={vol} />
       <AbsoluteFill style={{ filter: `blur(${34 * pp}px) brightness(${1 - 0.35 * pp}) saturate(0.9)`, transform: `scale(${1 + 0.08 * pp})` }}>
         <OffthreadVideo src={src} trimBefore={trim} muted style={{ width: 1920, height: 1080 }} />
       </AbsoluteFill>
