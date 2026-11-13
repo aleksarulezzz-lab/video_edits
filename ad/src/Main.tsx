@@ -53,9 +53,12 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
     <div style={{ position: "absolute", inset: 0, transformOrigin: `${F.x}px ${F.y}px`, transform: `scale(${z})` }}>{child}</div>
   );
   // the phrase sits in the frame (not zoomed), between the zoomed footage and her zoomed cut-out
+  // the lightened copy has no sound: her voice then comes from the original recording
+  const voice = lift ? <Audio src={staticFile(FILE[c.src])} trimBefore={Math.round(c.in * FPS)} volume={vol} /> : null;
   const frame = (
     <>
-      {zoomed(<OffthreadVideo src={src} trimBefore={trim} volume={vol} style={{ width: 1920, height: 1080 }} />)}
+      {voice}
+      {zoomed(<OffthreadVideo src={src} trimBefore={trim} volume={vol} muted={lift} style={{ width: 1920, height: 1080 }} />)}
       {depth.map((e, i) => <DepthText key={`t${i}`} e={e} t={t} />)}
       {depth.map((e, i) => zoomed(<DepthCut key={`c${i}`} e={e} srcT={c.in + f / FPS} />))}
     </>
@@ -70,7 +73,7 @@ const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) 
   return (
     <AbsoluteFill style={{ overflow: "hidden", backgroundColor: C.navy }}>
       {/* her voice keeps going under the window: every picture layer below is muted */}
-      <Audio src={src} trimBefore={trim} volume={vol} />
+      <Audio src={lift ? staticFile(FILE[c.src]) : src} trimBefore={lift ? Math.round(c.in * FPS) : trim} volume={vol} />
       <AbsoluteFill style={{ filter: `blur(${34 * pp}px) brightness(${1 - 0.35 * pp}) saturate(0.9)`, transform: `scale(${1 + 0.08 * pp})` }}>
         <OffthreadVideo src={src} trimBefore={trim} muted style={{ width: 1920, height: 1080 }} />
       </AbsoluteFill>
