@@ -13,7 +13,10 @@ import data from "./data/reels.json";
 type Part = { src: string; a: number; b: number; out: number };
 type Sub = { a: number; b: number; text: string };
 type Win = { a: number; b: number; kind: string };
-export type ReelData = { name: string; title: string[]; duration: number; parts: Part[]; subs: Sub[]; windows: Win[] };
+type Over = { a: number; b: number; img: string };
+type RvIns = { a: number; b: number; at: number };
+export type ReelData = { name: string; title: string[]; duration: number; parts: Part[]; subs: Sub[]; windows: Win[]; over?: Over[]; rvins?: RvIns[];
+  intro?: { lines: string[]; d: number }; cta?: string };
 export const REELS = data as ReelData[];
 export const END = 4.0;
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
@@ -26,7 +29,8 @@ const LongPart: React.FC<{ d: ReelData; p: Part; n: number }> = ({ d, p, n }) =>
   const t = p.out + f / FPS;
   const vol = (fr: number) => Math.min(1, (fr + 1) / 3, (n - fr) / 3);
   // 0 = author fills the frame, 1 = 16:9 window
-  const w = Math.max(0, ...d.windows.map((x) => interpolate(t, [x.a - 0.2, x.a, x.b, x.b + 0.2], [0, 1, 1, 0], clamp)));
+  const ov = (d.over ?? []).find((x) => t >= x.a && t < x.b);
+  const w = Math.max(0, ...[...d.windows, ...(d.over ?? [])].map((x) => interpolate(t, [x.a - 0.2, x.a, x.b, x.b + 0.2], [0, 1, 1, 0], clamp)));
   const src = staticFile("media/final.mp4");
   const trim = Math.round(p.a * FPS);
   return (
@@ -44,7 +48,15 @@ const LongPart: React.FC<{ d: ReelData; p: Part; n: number }> = ({ d, p, n }) =>
       {w > 0.001 ? (
         <div style={{ position: "absolute", left: 0, top: 650, width: 1080, height: 608, opacity: w, transform: `scale(${0.96 + 0.04 * w})`,
           boxShadow: "0 0 0 2px rgba(150,180,255,0.9), 0 0 30px rgba(47,95,208,0.7), 0 30px 60px rgba(0,0,0,0.5)" }}>
-          <OffthreadVideo src={src} trimBefore={trim} muted style={{ width: 1080, height: 608 }} />
+          {ov ? (
+            // the order she is reading, as a still of the freelance site
+            <div style={{ position: "absolute", inset: 0, background: "#fff", overflow: "hidden" }}>
+              <Img src={staticFile(ov.img)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "left top",
+                transform: `scale(${1.32 + 0.05 * Math.min(1, (t - ov.a) / Math.max(0.5, ov.b - ov.a))})`, transformOrigin: "left top" }} />
+            </div>
+          ) : (
+            <OffthreadVideo src={src} trimBefore={trim} muted style={{ width: 1080, height: 608 }} />
+          )}
         </div>
       ) : null}
     </AbsoluteFill>
@@ -131,6 +143,38 @@ const EndCard: React.FC<{ t: number }> = ({ t }) => {
   );
 };
 
+/* ---------- card before the reel: what the viewer gets from it ---------- */
+const IntroCard: React.FC<{ lines: string[]; t: number; d: number }> = ({ lines, t, d }) => {
+  const a = ease(t, 0.05, 0.45, EASE.spring), b = ease(t, 0.3, 0.45, EASE.spring);
+  const o = interpolate(t, [d - 0.25, d], [1, 0], clamp);
+  return (
+    <AbsoluteFill style={{ background: C.kraft, opacity: o }}>
+      <Grain seed={23} opacity={0.6} />
+      <AbsoluteFill style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 26 }}>
+        <div style={{ opacity: a, transform: `scale(${0.8 + 0.2 * a}) rotate(-2deg)` }}><Strip text={lines[0]} bg={C.cream} fg={C.navy} size={76} seed={331} rot={0} /></div>
+        <div style={{ opacity: b, transform: `scale(${0.8 + 0.2 * b}) rotate(1.5deg)` }}><Strip text={lines[1]} bg={C.yellow} size={76} seed={332} rot={0} /></div>
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
+/* ---------- Instagram / Dzen end card: the lesson for a comment ---------- */
+const CommentCard: React.FC<{ t: number }> = ({ t }) => {
+  const bg = ease(t, 0, 0.35), a = ease(t, 0.15, 0.45, EASE.spring), b = ease(t, 0.5, 0.45, EASE.spring), c = ease(t, 0.9, 0.45, EASE.spring);
+  return (
+    <AbsoluteFill style={{ background: C.cream, opacity: bg }}>
+      <Grain seed={78} opacity={0.45} />
+      <AbsoluteFill style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 34 }}>
+        <div style={{ opacity: a, transform: `translateY(${(1 - a) * 30}px)` }}><Strip text="Напиши в комментариях" bg={C.navy} fg={C.cream} size={70} seed={341} rot={-1.5} /></div>
+        <div style={{ opacity: b, transform: `scale(${0.7 + 0.3 * b})` }}>
+          <div style={{ ...glass(true), background: C.blue, padding: "26px 60px", fontFamily: UI, fontWeight: 700, fontSize: 110, color: "#fff", letterSpacing: -1 }}>«Анимация»</div>
+        </div>
+        <div style={{ opacity: c, transform: `translateY(${(1 - c) * 30}px)` }}><Strip text="и забирай урок" bg={C.yellow} size={70} seed={342} rot={1.5} /></div>
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
 export const ReelAd: React.FC<{ n: number }> = ({ n }) => {
   const d = REELS[n - 1];
   const f = useCurrentFrame();
@@ -147,14 +191,28 @@ export const ReelAd: React.FC<{ n: number }> = ({ n }) => {
           </Sequence>
         );
       })}
-      {t < d.duration ? (
+      {(d.rvins ?? []).map((x, i) => (
+        // pieces of the ready vertical ad over her speech (muted): more motion design on screen
+        <Sequence key={`r${i}`} from={Math.round(x.a * FPS)} durationInFrames={Math.round((x.b - x.a) * FPS)}>
+          <AbsoluteFill style={{ opacity: interpolate(f / FPS - x.a, [0, 0.15, x.b - x.a - 0.15, x.b - x.a], [0, 1, 1, 0], clamp) }}>
+            <OffthreadVideo src={staticFile("media/rv.mp4")} trimBefore={Math.round(x.at * FPS)} muted style={{ width: 1080, height: 1920 }} />
+          </AbsoluteFill>
+        </Sequence>
+      ))}
+      {d.intro ? (
+        <Sequence from={0} durationInFrames={Math.round(d.intro.d * FPS)}>
+          <IntroCard lines={d.intro.lines} t={t} d={d.intro.d} />
+          <Audio src={staticFile("sfx/paper.wav")} volume={0.2} />
+        </Sequence>
+      ) : null}
+      {t < d.duration && t >= (d.intro?.d ?? 0) ? (
         <>
-          {!rv ? <Title lines={d.title} t={t} until={d.duration} /> : null}
+          {!rv && !(d.rvins ?? []).some((x) => t >= x.a - 0.1 && t < x.b + 0.1) ? <Title lines={d.title} t={t} until={d.duration} /> : null}
           <Subs d={d} t={t} top={rv ? 1580 : 1430} />
         </>
       ) : null}
       <Sequence from={Math.round(d.duration * FPS)} durationInFrames={Math.round(END * FPS)}>
-        <EndCard t={(f - Math.round(d.duration * FPS)) / FPS} />
+        {d.cta === "comment" ? <CommentCard t={(f - Math.round(d.duration * FPS)) / FPS} /> : <EndCard t={(f - Math.round(d.duration * FPS)) / FPS} />}
         <Audio src={staticFile("sfx/paper.wav")} volume={0.18} />
       </Sequence>
     </AbsoluteFill>
