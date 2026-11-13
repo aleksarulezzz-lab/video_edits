@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { C, EASE, FPS, GLOW, ELEGANT, ROUND, SERIF, UI } from "./theme";
+import { Board, Stack, Step, Vis } from "./adhd";
 import { LogoPill, Mark, SideCaption, WindowLabel, ease, fade, glass } from "./glass";
 import { Grain, Sheet, Strip, jitter, torn } from "./paper";
 import { Guide, Insert, Listen, Plate } from "./inserts";
@@ -30,12 +31,16 @@ const FACEON = (e: Ev) => e.face !== false;
 const PIPC = { x: 1690, y: 820, r: 165 };
 const FG_FRAMES: Record<string, number> = { bez: 111, snachala: 150, golos: 114, glaza: 174, zamysel: 126, ot3000: 126 };
 
+const LIFT = [142.5, 281.4];
+
 const MainClip: React.FC<{ c: Clip; idx: number; n: number }> = ({ c, idx, n }) => {
   const f = useCurrentFrame();
   const t = c.out + f / FPS;
   const vol = (fr: number) => Math.min(1, (fr + 1) / 2, (n - fr) / 2);
-  const src = staticFile(FILE[c.src]);
-  const trim = Math.round(c.in * FPS);
+  // the first minute uses the copy with her shadow on the wall lightened (tools/ad_lift.py)
+  const lift = c.src === "main" && c.in >= LIFT[0] && c.in + c.dur <= LIFT[1];
+  const src = staticFile(lift ? "media/main_lift.mp4" : FILE[c.src]);
+  const trim = Math.round((lift ? c.in - LIFT[0] : c.in) * FPS);
   if (c.src === "rh") {
     return <OffthreadVideo src={src} trimBefore={trim} volume={(fr) => 0.52 * vol(fr)} style={{ width: 1920, height: 1080 }} />;
   }
@@ -324,7 +329,7 @@ export const Main: React.FC = () => {
   );
   // side captions: one per side at a time; second slot when the side is busy
   const sides = EV.filter((e) => e.kind === "side" && on(e, t, 0.4));
-  const covered = EV.some((e) => (["broll", "insert", "tier", "listen", "stinger", "guide"].includes(e.kind) || PIP(e) || (e.kind === "clip" && e.mode === "full")) && on(e, t));
+  const covered = EV.some((e) => (["broll", "insert", "tier", "listen", "stinger", "guide", "step", "board"].includes(e.kind) || PIP(e) || (e.kind === "clip" && e.mode === "full")) && on(e, t));
   return (
     <AbsoluteFill style={{ backgroundColor: C.cream }}>
       {CLIPS.map((c, i) => {
@@ -356,10 +361,14 @@ export const Main: React.FC = () => {
       {EV.filter((e) => e.kind === "wallnum" && on(e, t, 0.5)).map((e, i) => <WallNumber key={`w${i}`} t={t} e={e} />)}
       {!covered ? sides.map((e, i) => <SideCaption key={`c${i}`} t={t} a={e.a} b={e.b} text={e.text as string} side={e.side as string} slot={0} icon={e.icon as string} big={!!e.big} />) : null}
       {!covered ? EV.filter((e) => e.kind === "logo" && on(e, t, 0.4)).map((e, i) => <LogoPill key={`l${i}`} t={t} a={e.a} b={e.b} logo={e.logo as string} label={e.label as string} side={e.side as string} />) : null}
+      {!covered ? EV.filter((e) => e.kind === "vis" && on(e, t, 0.6)).map((e, i) => <Vis key={`v${i}`} t={t} e={e} />) : null}
+      {!covered ? EV.filter((e) => e.kind === "stack" && on(e, t, 0.6)).map((e, i) => <Stack key={`s${i}`} t={t} e={e} />) : null}
+      {EV.map((e, i) => (e.kind === "board" ? seq(e, i, <Board e={e} />) : null))}
       {EV.filter((e) => e.kind === "plate" && on(e, t, 0.4)).map((e, i) => <Plate key={`p${i}`} t={t} e={e} />)}
+      {EV.map((e, i) => (e.kind === "step" ? seq(e, i, <Step e={e} />, 10) : null))}
       {EV.map((e, i) => (e.kind === "stinger" ? seq(e, i, <Stinger e={e} />, 10) : null))}
       {EV.map((e, i) => {
-        const s = e.kind === "stinger" || e.kind === "insert" || e.kind === "guide" ? ["paper", 0.16] : e.kind === "side" || e.kind === "logo" || e.kind === "plate" ? ["puff", 0.08] : e.kind === "depth" || e.kind === "wallnum" ? ["swell", 0.07] : null;
+        const s = e.kind === "stinger" || e.kind === "step" || e.kind === "insert" || e.kind === "guide" ? ["paper", 0.16] : e.kind === "side" || e.kind === "logo" || e.kind === "plate" || e.kind === "vis" || e.kind === "stack" ? ["puff", 0.08] : e.kind === "depth" || e.kind === "wallnum" ? ["swell", 0.07] : null;
         return s ? <SFX key={`x${i}`} at={e.a} kind={s[0] as string} vol={s[1] as number} /> : null;
       })}
     </AbsoluteFill>

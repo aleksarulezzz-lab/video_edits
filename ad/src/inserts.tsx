@@ -262,6 +262,9 @@ export const Listen: React.FC<{ e: Ev }> = ({ e }) => {
   return (
     <AbsoluteFill style={{ opacity: o, background: `radial-gradient(80% 70% at 50% 45%, #253a78, ${C.navy})` }}>
       <Grain seed={7} opacity={0.22} />
+      {e.lead ? <div style={{ position: "absolute", left: 0, right: 0, top: 90, display: "flex", justifyContent: "center", opacity: interpolate(f / FPS, [0.1, 0.5], [0, 1], clamp) }}>
+        <Strip text={e.lead as string} bg={C.yellow} size={66} seed={57} rot={-1.5} />
+      </div> : null}
       <div style={{ position: "absolute", left: 0, right: 0, top: 260, height: 420, display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
         {vals.map((v: number, i: number) => {
           const h = 24 + v * 380;

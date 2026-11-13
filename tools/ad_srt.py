@@ -72,10 +72,16 @@ FIX = [
     ("для рилс / на все это", "для рилс. / На всё это"),
     ("включения все остальное рендеры", "включения, всё остальное — рендеры"),
     ("того что получилось", "того, что получилось."),
-    ("подписка на клод мне понадобилось у меня", "Одна подписка на Claude мне понадобилась: у меня"),
+    ("одна подписка на клод мне понадобилось у меня", "Одна подписка на Claude мне понадобилась: у меня"),
     ("тариф про за 20 долларов бесплатный", "тариф Pro за 20 долларов, и бесплатный"),
     ("на 11 labs который", "на ElevenLabs, который"),
     ("Еще одна вещь", "Ещё одна вещь"),
+    ("Это тоже вот я", "Это тоже я"),
+    ("выложить Как шорт или рилс Для рилс", "выложить как шорт или рилс. Для рилс"),
+    ("формат Переделать", "формат. Переделать"),
+    ("прямо В режиме чата с клодом то вертикальные", "прямо в режиме чата с Claude, то вертикальные"),
+    ("тариф про за 20 долларов и бесплатный", "тариф Pro за 20 долларов и бесплатный"),
+    ("заказы. Вот", "заказы. Вот"),
     ("доснимать. сделать полностью рилс из мошен", "доснимать. Можно сделать полностью рилс из моушн-"),
     ("в производстве это", "И в производстве это"),
     ("однокадровый голос, все", "закадровый голос, всё"),
@@ -105,21 +111,37 @@ FIX = [
     ("интересно почитать", "интересно почитать."),
     ("час работы из них", "час работы, из них"),
 ]
+# fixes work on the word stream, so a phrase may straddle two subtitle pages;
+# a fix that only adds words already said next to it (after a re-cut) is skipped
+toks = [(i, w) for i, p in enumerate(pages) for w in p[2].split()]
+def low(x): return x.lower()
 for old, new in FIX:
-    for p in pages:
-        if old in p[2]:
-            p[2] = p[2].replace(old, new, 1)
-            break
-    else:
-        # the phrase can straddle two pages: join them
-        for i in range(len(pages) - 1):
-            j = pages[i][2] + " / " + pages[i + 1][2]
-            if old in j:
-                a, b = j.replace(old, new, 1).split(" / ", 1) if " / " in j.replace(old, new, 1) else (j.replace(old, new, 1), "")
-                pages[i][2], pages[i + 1][2] = a, b
-                break
-        else:
-            print("not found:", old)
+    o = old.replace(" / ", " ").split(); n = new.replace(" / ", " ").split()
+    hit = None
+    for k in range(len(toks) - len(o) + 1):
+        seg = [w for _, w in toks[k:k + len(o)]]
+        if all(a == b or (b[-1:] not in ".,!?:;" and a.rstrip(".,!?:;") == b) for a, b in zip(seg, o)):
+            hit = k; break
+    if hit is None:
+        print("not found:", old); continue
+    # words the fix adds in front of / after the match must not be there already
+    j = next((m for m in range(len(n)) if n[m:m + 1] and low(n[m]).strip(".,") == low(o[0]).strip(".,")), 0)
+    before = [low(w).strip(".,:«»") for _, w in toks[max(0, hit - j):hit]]
+    if j and before == [low(w).strip(".,:«»") for w in n[:j]]:
+        continue
+    added_tail = n[len(n) - (len(n) - len(o)):] if len(n) > len(o) else []
+    nxt = [low(w).strip(".,:«»") for _, w in toks[hit + len(o): hit + len(o) + len(added_tail)]]
+    if added_tail and n[:len(o)] and [low(w).strip(".,:«»") for w in n[:len(o)]] == [low(w).strip(".,:«»") for w in o] and nxt == [low(w).strip(".,:«»") for w in added_tail]:
+        continue
+    tail = toks[hit + len(o) - 1][1]
+    if tail[-1:] in ".,!?:;" and o[-1][-1:] not in ".,!?:;" and n[-1][-1:] not in ".,!?:;»":
+        n[-1] += tail[-1]
+    pg = [toks[hit + min(m * len(o) // max(1, len(n)), len(o) - 1)][0] for m in range(len(n))]
+    toks[hit:hit + len(o)] = list(zip(pg, n))
+for p in pages:
+    p[2] = ""
+for i, w in toks:
+    pages[i][2] = (pages[i][2] + " " + w).strip()
 
 def norm_text(t):
     t = re.sub(r"\bмошен[ -]?(анимаци\w*)", r"моушн-\1", t)
