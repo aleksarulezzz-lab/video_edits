@@ -151,8 +151,8 @@ const IntroCard: React.FC<{ lines: string[]; t: number; d: number }> = ({ lines,
     <AbsoluteFill style={{ background: C.kraft, opacity: o }}>
       <Grain seed={23} opacity={0.6} />
       <AbsoluteFill style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 26 }}>
-        <div style={{ opacity: a, transform: `scale(${0.8 + 0.2 * a}) rotate(-2deg)` }}><Strip text={lines[0]} bg={C.cream} fg={C.navy} size={76} seed={331} rot={0} /></div>
-        <div style={{ opacity: b, transform: `scale(${0.8 + 0.2 * b}) rotate(1.5deg)` }}><Strip text={lines[1]} bg={C.yellow} size={76} seed={332} rot={0} /></div>
+        <div style={{ opacity: a, transform: `scale(${0.8 + 0.2 * a}) rotate(-2deg)` }}><Strip text={lines[0]} bg={C.cream} fg={C.navy} size={lines[0].length > 24 ? 58 : 76} seed={331} rot={0} /></div>
+        <div style={{ opacity: b, transform: `scale(${0.8 + 0.2 * b}) rotate(1.5deg)` }}><Strip text={lines[1]} bg={C.yellow} size={lines[1].length > 24 ? 58 : 76} seed={332} rot={0} /></div>
       </AbsoluteFill>
     </AbsoluteFill>
   );
