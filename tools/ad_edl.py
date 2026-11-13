@@ -60,10 +60,26 @@ for n, it in enumerate(spec):
     start = it.get("start_at", quietest(src, max(prev_e + 0.03, a - 0.25), a + 0.03))
     end = it.get("end_at", quietest(src, b - 0.03, min(next_s - 0.03, b + 0.3)))
     pieces, cur = [], start
-    for p0, p1 in ([] if it.get("keep") else pauses(src, start, end)):
-        if p0 - cur > 0.2 and end - p1 > 0.3:
-            pieces.append((cur, p0 + 0.15))
-            cur = p1 - 0.15
+    # a pause is shortened only where no word sounds. Whisper's word times drift (often ~0.3 s early),
+    # so a word is protected over [s, e + 0.3]; soft word endings («деньги», «создания») are not pauses.
+    # Inside a pause the longest stretch free of words is cut, keeping 0.18 s of air on each side.
+    guard = sorted((w["s"], w["e"] + 0.3) for w in ws if w["e"] > start - 1 and w["s"] < end + 1)
+    for p0, p1 in ([] if it.get("keep") else pauses(src, start, end, 0.5)):
+        free, lo = [], p0
+        for g0, g1 in guard:
+            if g1 <= lo or g0 >= p1:
+                continue
+            if g0 > lo: free.append((lo, g0))
+            lo = max(lo, g1)
+        if lo < p1: free.append((lo, p1))
+        if not free:
+            continue
+        f0, f1 = max(free, key=lambda x: x[1] - x[0])
+        if f1 - f0 < 0.5:
+            continue
+        if f0 - cur > 0.2 and end - f1 > 0.3:
+            pieces.append((cur, f0 + 0.18))
+            cur = f1 - 0.18
     pieces.append((cur, end))
     out0 = t
     for k, (pa, pb) in enumerate(pieces):
