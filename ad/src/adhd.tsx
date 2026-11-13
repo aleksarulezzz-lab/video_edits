@@ -103,13 +103,13 @@ export const Vis: React.FC<{ e: Ev; t: number }> = ({ e, t }) => {
   if (type === "price") {
     const lines = (e.text as string).split("|");
     return (
-      <Card L={L} p={p} out={out} w={470} top={(e.top as number) ?? 200} rot={L ? -4 : 4}>
+      <Card L={L} p={p} out={out} w={600} top={(e.top as number) ?? 200} rot={L ? -4 : 4}>
         <div style={{ position: "relative", background: C.yellow, clipPath: "polygon(14% 0, 100% 0, 100% 100%, 14% 100%, 0 50%)", padding: "34px 40px 34px 110px",
           filter: "drop-shadow(0 16px 22px rgba(20,20,30,0.4))" }}>
           <Grain seed={61} opacity={0.3} />
           <div style={{ position: "absolute", left: 40, top: "50%", width: 30, height: 30, marginTop: -15, borderRadius: "50%", background: C.cream }} />
           <div style={{ position: "relative", fontFamily: SERIF, fontWeight: 700, fontSize: 40, color: C.navy }}>{lines[0]}</div>
-          <div style={{ position: "relative", fontFamily: SERIF, fontWeight: 700, fontSize: 74, lineHeight: 1.05, color: C.ink, whiteSpace: "nowrap" }}>{lines[1]}</div>
+          <div style={{ position: "relative", fontFamily: SERIF, fontWeight: 700, fontSize: 66, lineHeight: 1.05, color: C.ink, whiteSpace: "nowrap" }}>{lines[1]}</div>
         </div>
       </Card>
     );
