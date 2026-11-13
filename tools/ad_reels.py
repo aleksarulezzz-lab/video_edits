@@ -68,7 +68,8 @@ OVER = {"reel_5_vakansiya": [("reelimg/fl_8.5.png", "пошла на биржу"
 # reel 8: more motion design from the ready vertical ad (pieces not used in the other reels), muted, full screen
 RVINS = {"reel_8_ne_tolko_golova": [("можно разбавить видео", 56.9), ("несколько однообразный", 61.0), ("разнообразит как раз", 68.3),
                                     ("вставлять его точечно", 74.5), ("есть замысел", 79.3)]}
-INTRO = {"reel_6_reklama_dorozhaet": ["Как делать такие ролики", "и $арабатывать на этом"]}
+INTRO = {"reel_6_reklama_dorozhaet": ["Как делать такие ролики", "и $арабатывать на этом"],
+         "reel_7_drugoe_utro": ["Это видео сделала нейросеть.", "Без дизайнера"]}
 
 # ready vertical ad: subtitles from its own transcript (same text as the horizontal one)
 RV = [{"a": s["start"], "b": s["end"], "text": s["text"]} for s in json.load(open(f"{root}/transcript/ready_horizontal.json"))]
@@ -190,9 +191,9 @@ for name, title, segs in REELS:
             for x in lst: x["a"] = round(x["a"] + D, 3); x["b"] = round(x["b"] + D, 3)
         item["duration"] = round(off + D, 3); item["intro"] = {"lines": INTRO[name], "d": D}
     out.append(item)
-    if name == "reel_6_reklama_dorozhaet":  # Instagram / Dzen: comment call instead of the link to the full video
-        out.append({**item, "name": name + "_insta", "cta": "comment"})
     print(f"{name:28s} {off:5.1f}s parts={len(parts)} subs={len(subs)} windows={len(looks)}")
+# Instagram / Dzen versions: the comment call («Анимация») instead of the link to the full video; Reel9..Reel16
+out += [{**it, "name": it["name"] + "_insta_dzen", "cta": "comment"} for it in list(out)]
 import os
 os.makedirs(f"{root}/src/reels/data", exist_ok=True)
 json.dump(out, open(f"{root}/src/reels/data/reels.json", "w"), ensure_ascii=False)
