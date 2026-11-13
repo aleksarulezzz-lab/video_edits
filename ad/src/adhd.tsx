@@ -21,7 +21,8 @@ export const Stack: React.FC<{ e: Ev; t: number }> = ({ e, t }) => {
   const W = (e.w as number) ?? (L ? 720 : 560);
   const fs = (e.fs as number) ?? 48;
   // a single plate sits lower on the wall, a list starts higher and grows down
-  const top = (e.top as number) ?? (items.length >= 3 ? 130 : items.length === 2 ? 200 : 280);
+  // under the poster, on the plain wall (the poster fills the top-left corner of her frame)
+  const top = (e.top as number) ?? (items.length >= 3 ? 400 : 440);
   return (
     <div style={{ position: "absolute", top, [L ? "left" : "right"]: 56, width: W, display: "flex", flexDirection: "column",
       alignItems: L ? "flex-start" : "flex-end", gap: 18, opacity: out }}>
@@ -33,7 +34,7 @@ export const Stack: React.FC<{ e: Ev; t: number }> = ({ e, t }) => {
         return (
           <div key={i} style={{ opacity: Math.min(1, p * 1.5), transform: `translateX(${(1 - p) * (L ? -90 : 90)}px) scale(${0.9 + 0.1 * p})`,
             transformOrigin: L ? "left center" : "right center",
-            ...glass(dark), ...(tone === "blue" ? { background: "linear-gradient(180deg, rgba(47,95,208,0.92), rgba(36,74,170,0.9))" } : {}),
+            ...glass(dark), background: tone === "blue" ? "linear-gradient(180deg, rgba(47,95,208,0.97), rgba(36,74,170,0.96))" : dark ? "rgba(29,42,85,0.95)" : "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(246,242,234,0.94))",
             padding: "20px 30px 22px", display: "flex", alignItems: "center", gap: 18, maxWidth: W }}>
             {items.length > 1 && e.numbers !== false ? (
               <div style={{ width: fs * 1.05, height: fs * 1.05, flex: "none", borderRadius: "50%", background: dark ? "#fff" : C.blue, color: dark ? C.blue : "#fff",
